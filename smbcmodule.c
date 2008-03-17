@@ -55,8 +55,13 @@ initsmbc (void)
 
   PyModule_AddObject (m, "Dirent", (PyObject *) &smbc_DirentType);
 
-#define INT_CONSTANT(prefix, name)				\
-  PyDict_SetItemString (d, #name, PyInt_FromLong (prefix##name))
+#define INT_CONSTANT(prefix, name)			\
+  do							\
+  {							\
+    PyObject *val = PyInt_FromLong (prefix##name);	\
+    PyDict_SetItemString (d, #name, val);		\
+    Py_DECREF (val);					\
+  } while (0);
 
   INT_CONSTANT (SMBC_, WORKGROUP);
   INT_CONSTANT (SMBC_, SERVER);
