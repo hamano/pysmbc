@@ -1,0 +1,4 @@
+2008-03-11  Tim Waugh  <twaugh@redhat.com>
+
+	* Makefile (VERSION): Initial release.
+
