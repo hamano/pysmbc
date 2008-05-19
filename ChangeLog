@@ -4,8 +4,7 @@
 	(Dir_dealloc): Use smbc_getFunctionClosedir.
 	(Dir_getdents): Use smbc_getFunctionGetdents.
 
-	* context.c (Context_init): Don't set deprecated struct members.
-	(Context_setFunctionAuthData): New function.
+	* context.c (Context_setFunctionAuthData): New function.
 	(Context_getseters): Set FunctionAuthData member.
 	(Context_getOptionNoAutoAnonymousLogin): New function.
 	(Context_setOptionNoAutoAnonymousLogin): New function.

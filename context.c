@@ -97,16 +97,33 @@ Context_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
 static int
 Context_init (Context *self, PyObject *args, PyObject *kwds)
 {
-  SMBCCTX *ctx;
+  PyObject *auth = NULL;
   int debug = 0;
+  unsigned int flags = 0;
+  SMBCCTX *ctx;
   static char *kwlist[] = 
     {
+      "auth_fn",
       "debug",
+      "flags",
       NULL
     };
 
-  if (!PyArg_ParseTupleAndKeywords (args, kwds, "|i", kwlist, &debug))
+  if (!PyArg_ParseTupleAndKeywords (args, kwds, "|Oii", kwlist,
+				    &auth, &debug, &flags))
     return -1;
+
+  if (auth)
+    {
+      if (!PyCallable_Check (auth))
+	{
+	  PyErr_SetString (PyExc_TypeError, "auth_fn must be callable");
+	  return -1;
+	}
+
+      Py_XINCREF (auth);
+      self->auth_fn = auth;
+    }
 
   debugprintf ("-> Context_init ()\n");
 
@@ -118,6 +135,9 @@ Context_init (Context *self, PyObject *args, PyObject *kwds)
       debugprintf ("<- Context_init() EXCEPTION\n");
       return -1;
     }
+
+  if (flags)
+    ctx->flags |= flags;
 
   if (smbc_init_context (ctx) == NULL)
     {
