@@ -1,3 +1,4 @@
+import errno
 import smbc
 import gtk, gobject
 import pwd, os
@@ -92,8 +93,10 @@ class AuthContext:
     def initial_authentication (self):
         pass
 
-    def failed (self):
+    def failed (self, exc=None):
         self.has_failed = True
+        if exc and not self.auth_called:
+            raise exc
 
     def callback (self, server, share, workgroup, user, password):
         self.auth_called = True
@@ -143,12 +146,17 @@ class Browser:
         ctx.OptionNoAutoAnonymousLogin = True
         self.smbc = ctx
         self.auth = AuthContext (w)
-        while self.auth.perform_authentication () > 0:
-            try:
-                workgroups = self.smbc.opendir ("smb://").getdents ()
-            except:
-                self.auth.failed ()
+        try:
+            while self.auth.perform_authentication () > 0:
+                try:
+                    workgroups = self.smbc.opendir ("smb://").getdents ()
+                except Exception, e:
+                    self.auth.failed (e)
+        except RuntimeError, (e, s):
+            if e == errno.ENOENT:
                 workgroups = None
+            else:
+                raise
 
         if workgroups:
             for workgroup in workgroups:
@@ -193,12 +201,17 @@ class Browser:
 
             uri = "smb://%s" % entry.name
             self.auth = AuthContext (self.main)
-            while self.auth.perform_authentication () > 0:
-                try:
-                    servers = self.smbc.opendir (uri).getdents ()
-                except:
-                    self.auth.failed ()
+            try:
+                while self.auth.perform_authentication () > 0:
+                    try:
+                        servers = self.smbc.opendir (uri).getdents ()
+                    except Exception, e:
+                        self.auth.failed (e)
+            except RuntimeError, (e, s):
+                if e == errno.ENOENT:
                     servers = None
+                else:
+                    raise
 
             if servers:
                 for server in servers:
@@ -222,15 +235,17 @@ class Browser:
             uri = "smb://%s" % entry.name
 
             self.auth = AuthContext (self.main)
-            while self.auth.perform_authentication () > 0:
-                try:
-                    shares = self.smbc.opendir (uri).getdents ()
-                except RuntimeError, (e, m):
-                    self.auth.failed ()
-                    shares = None
-                    if e != 13 and e != 1:
-                        del self.expanding_row
-                        raise
+            try:
+                while self.auth.perform_authentication () > 0:
+                    try:
+                        shares = self.smbc.opendir (uri).getdents ()
+                    except Exception, e:
+                        self.auth.failed (e)
+            except RuntimeError, (e, s):
+                shares = None
+                if e != errno.EACCES and e != errno.EPERM:
+                    del self.expanding_row
+                    raise
 
             if shares:
                 for share in shares:
