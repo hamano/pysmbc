@@ -1,5 +1,9 @@
 2008-05-19  Tim Waugh  <twaugh@redhat.com>
 
+	* context.c (Context_getDebug): New function.
+	(Context_setDebug): New function.
+	(Context_getseters): Set Debug member.
+
 	* dir.c (Dir_init): Use smbc_getFunctionOpendir.
 	(Dir_dealloc): Use smbc_getFunctionClosedir.
 	(Dir_getdents): Use smbc_getFunctionGetdents.

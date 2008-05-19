@@ -195,6 +195,29 @@ Context_opendir (Context *self, PyObject *args)
   return dir;
 }
 
+static PyObject *
+Context_getDebug (Context *self, void *closure)
+{
+  int d = smbc_getDebug (self->context);
+  return PyInt_FromLong (d);
+}
+
+static int
+Context_setDebug (Context *self, PyObject *value, void *closure)
+{
+  int d;
+
+  if (!PyInt_Check (value))
+    {
+      PyErr_SetString (PyExc_TypeError, "must be int");
+      return -1;
+    }
+
+  d = PyInt_AsLong (value);
+  smbc_setDebug (self->context, d);
+  return 0;
+}
+
 static int
 Context_setFunctionAuthData (Context *self, PyObject *value, void *closure)
 {
@@ -256,6 +279,12 @@ Context_setOptionNoAutoAnonymousLogin (Context *self, PyObject *value,
 
 PyGetSetDef Context_getseters[] =
   {
+    { "Debug",
+      (getter) Context_getDebug,
+      (setter) Context_setDebug,
+      "Debug level.",
+      NULL },
+
     { "FunctionAuthData",
       (getter) NULL,
       (setter) Context_setFunctionAuthData,
