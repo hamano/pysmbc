@@ -3,6 +3,7 @@
 	* context.c (Context_getDebug): New function.
 	(Context_setDebug): New function.
 	(Context_getseters): Set Debug member.
+	(Context_opendir): Removed incorrect Py_DECREF call.
 
 	* dir.c (Dir_init): Use smbc_getFunctionOpendir.
 	(Dir_dealloc): Use smbc_getFunctionClosedir.

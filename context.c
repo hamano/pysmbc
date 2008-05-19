@@ -181,7 +181,6 @@ Context_opendir (Context *self, PyObject *args)
   lkwlist = PyDict_New ();
   PyDict_SetItemString (lkwlist, "context", (PyObject *) self);
   PyDict_SetItemString (lkwlist, "uri", uri);
-  Py_DECREF (uri);
   dir = PyType_GenericNew (&smbc_DirType, largs, lkwlist);
   if (smbc_DirType.tp_init (dir, largs, lkwlist) < 0)
     {
