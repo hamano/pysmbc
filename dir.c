@@ -50,6 +50,7 @@ Dir_init (Dir *self, PyObject *args, PyObject *kwds)
   PyObject *ctxobj;
   Context *ctx;
   const char *uri;
+  smbc_opendir_fn fn;
   SMBCFILE *dir;
   static char *kwlist[] = 
     {
@@ -73,7 +74,8 @@ Dir_init (Dir *self, PyObject *args, PyObject *kwds)
   ctx = (Context *) ctxobj;
   self->context = ctx;
   current_context = ctx;
-  dir = ctx->context->opendir (ctx->context, uri);
+  fn = smbc_getFunctionOpendir (ctx->context);
+  dir = (*fn) (ctx->context, uri);
   if (dir == NULL)
     {
       PyErr_SetFromErrno (PyExc_RuntimeError);
@@ -89,11 +91,13 @@ static void
 Dir_dealloc (Dir *self)
 {
   Context *ctx = self->context;
+  smbc_closedir_fn fn;
   current_context = ctx;
   if (self->dir)
     {
       debugprintf ("%p closedir()\n", self->dir);
-      ctx->context->closedir (ctx->context, self->dir);
+      fn = smbc_getFunctionClosedir (ctx->context);
+      (*fn) (ctx->context, self->dir);
     }
 
   if (self->context)
@@ -110,6 +114,7 @@ Dir_getdents (Dir *self)
   PyObject *listobj;
   SMBCCTX *ctx;
   char dirbuf[1024];
+  smbc_getdents_fn fn;
   struct smbc_dirent *dirp;
   int dirlen;
 
@@ -118,9 +123,10 @@ Dir_getdents (Dir *self)
   ctx = current_context->context;
   dirp = (struct smbc_dirent *) dirbuf;
   listobj = PyList_New (0);
-  while ((dirlen = ctx->getdents (ctx, self->dir,
-				  (struct smbc_dirent *) dirbuf,
-				  sizeof (dirbuf))) != 0)
+  fn = smbc_getFunctionGetdents (ctx);
+  while ((dirlen = (*fn) (ctx, self->dir,
+			  (struct smbc_dirent *) dirbuf,
+			  sizeof (dirbuf))) != 0)
     {
       debugprintf ("dirlen = %d\n", dirlen);
       if (dirlen < 0)

@@ -1,3 +1,21 @@
+2008-05-19  Tim Waugh  <twaugh@redhat.com>
+
+	* dir.c (Dir_init): Use smbc_getFunctionOpendir.
+	(Dir_dealloc): Use smbc_getFunctionClosedir.
+	(Dir_getdents): Use smbc_getFunctionGetdents.
+
+	* context.c (Context_init): Don't set deprecated struct members.
+	(Context_setFunctionAuthData): New function.
+	(Context_getseters): Set FunctionAuthData member.
+	(Context_getOptionNoAutoAnonymousLogin): New function.
+	(Context_setOptionNoAutoAnonymousLogin): New function.
+	(Context_getseters): Set OptionNoAutoAnonymousLogin member.
+	(Context_getOptionDebugToStderr): New function.
+	(Context_setOptionDebugToStderr): New function.
+	(Context_init): Call smbc_init.
+
+	* test.py (Browser.__init__): Updated.
+
 2008-03-17  Tim Waugh  <twaugh@redhat.com>
 
 	* context.c (Context_opendir): Close memory leak.

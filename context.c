@@ -79,33 +79,6 @@ auth_fn (const char *server, const char *share,
   debugprintf ("<- auth_fn(), got callback result\n");
 }
 
-static int
-add_cached_srv_fn (SMBCCTX *c, SMBCSRV *srv,
-		   const char *server, const char *share,
-		   const char *workgroup, const char *username)
-{
-  return 0;
-}
-
-static SMBCSRV *
-get_cached_srv_fn (SMBCCTX *c, const char *server, const char *share,
-		   const char *workgroup, const char *username)
-{
-  return NULL;
-}
-
-static int
-remove_cached_srv_fn (SMBCCTX *c, SMBCSRV *srv)
-{
-  return 0;
-}
-
-static int
-purge_cached_fn (SMBCCTX *c)
-{
-  return 0;
-}
-
 /////////////
 // Context //
 /////////////
@@ -124,36 +97,20 @@ Context_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
 static int
 Context_init (Context *self, PyObject *args, PyObject *kwds)
 {
-  PyObject *auth = NULL;
-  int debug = -1;
-  unsigned int flags = 0;
   SMBCCTX *ctx;
+  int debug = 0;
   static char *kwlist[] = 
     {
-      "auth_fn",
       "debug",
-      "flags",
       NULL
     };
 
-  if (!PyArg_ParseTupleAndKeywords (args, kwds, "|Oii", kwlist,
-				    &auth, &debug, &flags))
+  if (!PyArg_ParseTupleAndKeywords (args, kwds, "|i", kwlist, &debug))
     return -1;
-
-  if (auth)
-    {
-      if (!PyCallable_Check (auth))
-	{
-	  PyErr_SetString (PyExc_TypeError, "auth_fn must be callable");
-	  return -1;
-	}
-
-      Py_XINCREF (auth);
-      self->auth_fn = auth;
-    }
 
   debugprintf ("-> Context_init ()\n");
 
+  smbc_init (auth_fn, debug);
   ctx = smbc_new_context ();
   if (ctx == NULL)
     {
@@ -162,15 +119,6 @@ Context_init (Context *self, PyObject *args, PyObject *kwds)
       return -1;
     }
 
-  if (debug != -1)
-    ctx->debug = debug;
-
-  ctx->flags |= flags;
-  ctx->callbacks.auth_fn = auth_fn;
-  ctx->callbacks.add_cached_srv_fn = add_cached_srv_fn;
-  ctx->callbacks.get_cached_srv_fn = get_cached_srv_fn;
-  ctx->callbacks.remove_cached_srv_fn = remove_cached_srv_fn;
-  ctx->callbacks.purge_cached_fn = purge_cached_fn;
   if (smbc_init_context (ctx) == NULL)
     {
       PyErr_SetFromErrno (PyExc_RuntimeError);
@@ -227,6 +175,88 @@ Context_opendir (Context *self, PyObject *args)
   return dir;
 }
 
+static int
+Context_setFunctionAuthData (Context *self, PyObject *value, void *closure)
+{
+  if (!PyCallable_Check (value))
+    {
+      PyErr_SetString (PyExc_TypeError, "must be callable object");
+      return -1;
+    }
+
+  Py_XINCREF (value);
+  self->auth_fn = value;
+  smbc_setFunctionAuthData (self->context, auth_fn);
+  return 0;
+}
+
+static PyObject *
+Context_getOptionDebugToStderr (Context *self, void *closure)
+{
+  smbc_bool b;
+  b = smbc_getOptionDebugToStderr (self->context);
+  return PyBool_FromLong ((long) b);
+}
+
+static int
+Context_setOptionDebugToStderr (Context *self, PyObject *value,
+				void *closure)
+{
+  if (!PyBool_Check (value))
+    {
+      PyErr_SetString (PyExc_TypeError, "must be Boolean");
+      return -1;
+    }
+
+  smbc_setOptionDebugToStderr (self->context, value == Py_True);
+  return 0;
+}
+
+static PyObject *
+Context_getOptionNoAutoAnonymousLogin (Context *self, void *closure)
+{
+  smbc_bool b;
+  b = smbc_getOptionNoAutoAnonymousLogin (self->context);
+  return PyBool_FromLong ((long) b);
+}
+
+static int
+Context_setOptionNoAutoAnonymousLogin (Context *self, PyObject *value,
+				       void *closure)
+{
+  if (!PyBool_Check (value))
+    {
+      PyErr_SetString (PyExc_TypeError, "must be Boolean");
+      return -1;
+    }
+
+  smbc_setOptionNoAutoAnonymousLogin (self->context, value == Py_True);
+  return 0;
+}
+
+PyGetSetDef Context_getseters[] =
+  {
+    { "FunctionAuthData",
+      (getter) NULL,
+      (setter) Context_setFunctionAuthData,
+      "Function for obtaining authentication data.",
+      NULL },
+
+    { "OptionDebugToStderr",
+      (getter) Context_getOptionDebugToStderr,
+      (setter) Context_setOptionDebugToStderr,
+      "Whether to log to standard error instead of standard output.",
+      NULL },
+
+    { "OptionNoAutoAnonymousLogin",
+      (getter) Context_getOptionNoAutoAnonymousLogin,
+      (setter) Context_setOptionNoAutoAnonymousLogin,
+      "Whether to automatically select anonymous login.",
+      NULL },
+
+    { NULL }
+  };
+
 PyMethodDef Context_methods[] =
   {
     { "opendir",
@@ -275,7 +305,7 @@ PyTypeObject smbc_ContextType =
     0,                         /* tp_iternext */
     Context_methods,           /* tp_methods */
     0,                         /* tp_members */
-    0,                         /* tp_getset */
+    Context_getseters,         /* tp_getset */
     0,                         /* tp_base */
     0,                         /* tp_dict */
     0,                         /* tp_descr_get */

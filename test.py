@@ -28,6 +28,10 @@ class AuthContext:
             self.tried_guest = True
             return 1
 
+        if not self.auth_called:
+            print "Expected authentication callback"
+            raise RuntimeError
+
         # After that, prompt
         d = gtk.Dialog ("Authentication", self.parent,
                         gtk.DIALOG_MODAL | gtk.DIALOG_NO_SEPARATOR,
@@ -134,9 +138,10 @@ class Browser:
         self.main = w
         w.show_all ()
 
-        self.smbc = smbc.Context (debug=0,
-                                  flags=smbc.FLAG_NO_AUTO_ANONYMOUS_LOGON,
-                                  auth_fn=self.auth_callback)
+        ctx = smbc.Context (debug=1)
+        ctx.FunctionAuthData = self.auth_callback
+        ctx.OptionNoAutoAnonymousLogin = True
+        self.smbc = ctx
         self.auth = AuthContext (w)
         while self.auth.perform_authentication () > 0:
             try:
