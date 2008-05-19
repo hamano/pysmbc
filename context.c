@@ -127,7 +127,6 @@ Context_init (Context *self, PyObject *args, PyObject *kwds)
 
   debugprintf ("-> Context_init ()\n");
 
-  smbc_init (auth_fn, debug);
   ctx = smbc_new_context ();
   if (ctx == NULL)
     {
