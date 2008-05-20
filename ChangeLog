@@ -1,3 +1,7 @@
+2008-05-20  Tim Waugh  <twaugh@redhat.com>
+
+	* context.c (Context_opendir): Fixed memory leak.
+
 2008-05-19  Tim Waugh  <twaugh@redhat.com>
 
 	* context.c (Context_getDebug): New function.

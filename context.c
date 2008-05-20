@@ -189,6 +189,8 @@ Context_opendir (Context *self, PyObject *args)
       return NULL;
     }
 
+  Py_DECREF (largs);
+  Py_DECREF (lkwlist);
   debugprintf ("%p <- Context_opendir() = Dir\n", self->context);
   return dir;
 }
