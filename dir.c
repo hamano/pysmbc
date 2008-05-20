@@ -75,7 +75,9 @@ Dir_init (Dir *self, PyObject *args, PyObject *kwds)
   self->context = ctx;
   current_context = ctx;
   fn = smbc_getFunctionOpendir (ctx->context);
+  Py_BEGIN_ALLOW_THREADS;
   dir = (*fn) (ctx->context, uri);
+  Py_END_ALLOW_THREADS;
   if (dir == NULL)
     {
       PyErr_SetFromErrno (PyExc_RuntimeError);
