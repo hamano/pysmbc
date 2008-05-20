@@ -23,10 +23,9 @@
 #include "dir.h"
 #include "file.h"
 
-Context *current_context;
-
 static void
-auth_fn (const char *server, const char *share,
+auth_fn (SMBCCTX *ctx,
+	 const char *server, const char *share,
 	 char *workgroup, int wgmaxlen,
 	 char *username, int unmaxlen,
 	 char *password, int pwmaxlen)
@@ -34,13 +33,15 @@ auth_fn (const char *server, const char *share,
   PyObject *args;
   PyObject *kwds;
   PyObject *result;
+  Context *self;
   const char *use_workgroup, *use_username, *use_password;
 
   debugprintf ("-> auth_fn (server=%s, share=%s)\n",
 	       server ? server : "",
 	       share ? share : "");
 
-  if (current_context->auth_fn == NULL)
+  self = smbc_getOptionUserData (ctx);
+  if (self->auth_fn == NULL)
     {
       debugprintf ("<- auth_fn (), no callback\n");
       return;
@@ -56,7 +57,7 @@ auth_fn (const char *server, const char *share,
 			username, password);
   kwds = PyDict_New ();
 
-  result = PyObject_Call (current_context->auth_fn, args, kwds);
+  result = PyObject_Call (self->auth_fn, args, kwds);
   Py_DECREF (args);
   Py_DECREF (kwds);
   if (result == NULL)
@@ -148,6 +149,10 @@ Context_init (Context *self, PyObject *args, PyObject *kwds)
     }
 
   self->context = ctx;
+  smbc_setOptionUserData (ctx, self);
+  if (auth)
+    smbc_setFunctionAuthDataWithContext (ctx, auth_fn);
+
   debugprintf ("%p <- Context_init() = 0\n", self->context);
   return 0;
 }
@@ -266,7 +271,7 @@ Context_setFunctionAuthData (Context *self, PyObject *value, void *closure)
 
   Py_XINCREF (value);
   self->auth_fn = value;
-  smbc_setFunctionAuthData (self->context, auth_fn);
+  smbc_setFunctionAuthDataWithContext (self->context, auth_fn);
   return 0;
 }
 

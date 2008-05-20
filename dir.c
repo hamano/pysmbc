@@ -73,11 +73,8 @@ Dir_init (Dir *self, PyObject *args, PyObject *kwds)
   Py_INCREF (ctxobj);
   ctx = (Context *) ctxobj;
   self->context = ctx;
-  current_context = ctx;
   fn = smbc_getFunctionOpendir (ctx->context);
-  Py_BEGIN_ALLOW_THREADS;
   dir = (*fn) (ctx->context, uri);
-  Py_END_ALLOW_THREADS;
   if (dir == NULL)
     {
       PyErr_SetFromErrno (PyExc_RuntimeError);
@@ -94,7 +91,6 @@ Dir_dealloc (Dir *self)
 {
   Context *ctx = self->context;
   smbc_closedir_fn fn;
-  current_context = ctx;
   if (self->dir)
     {
       debugprintf ("%p closedir()\n", self->dir);
@@ -121,8 +117,7 @@ Dir_getdents (Dir *self)
   int dirlen;
 
   debugprintf ("-> Dir_getdents()\n");
-  current_context = self->context;
-  ctx = current_context->context;
+  ctx = self->context->context;
   dirp = (struct smbc_dirent *) dirbuf;
   listobj = PyList_New (0);
   fn = smbc_getFunctionGetdents (ctx);

@@ -1,7 +1,6 @@
 2008-05-20  Tim Waugh  <twaugh@redhat.com>
 
-	* file.c (File_init): Allow threads during smbc_open call.
-	* dir.c (Dir_init): Allow threads during smbc_opendir call.
+	* context.c (auth_fn): User user data for storing Context object.
 
 	* context.c (Context_open): New method.
 
