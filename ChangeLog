@@ -1,5 +1,12 @@
 2008-05-20  Tim Waugh  <twaugh@redhat.com>
 
+	* context.c (Context_open): New method.
+
+	* file.h, file.c: New files.
+	* Makefile (SOURCES): Ship them.
+	* setup.py: Build and link them.
+	* smbcmodule.c (initsmbc): Include File type.
+
 	* context.c (Context_opendir): Fixed memory leak.
 
 2008-05-19  Tim Waugh  <twaugh@redhat.com>
