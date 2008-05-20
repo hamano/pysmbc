@@ -1,6 +1,13 @@
 NEWS
 ----
 
+New in 1.0.2:
+
+* Context.Debug -> Context.debug
+* Context.FunctionAuthData -> Context.functionAuthData
+* Context.OptionDebugToStderr -> Context.optionDebugToStderr
+* Context.OptionNoAutoAnonymousLogin -> Context.optionNoAutoAnonymousLogin
+
 New in 1.0.1:
 
 * Context.open()
