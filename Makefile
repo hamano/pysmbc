@@ -2,7 +2,7 @@ NAME=pysmbc
 VERSION=1.0.0
 
 SOURCES=smbcmodule.c smbcmodule.h context.c context.h dir.c dir.h \
-	smbcdirent.c smbcdirent.h setup.py
+	file.c file.h smbcdirent.c smbcdirent.h setup.py
 
 DIST=Makefile test.py COPYING NEWS README TODO ChangeLog
 

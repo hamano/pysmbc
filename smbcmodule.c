@@ -22,6 +22,7 @@
 #include "smbcmodule.h"
 #include "context.h"
 #include "dir.h"
+#include "file.h"
 #include "smbcdirent.h"
 
 static PyMethodDef SmbcMethods[] = {
@@ -47,6 +48,13 @@ initsmbc (void)
     return;
 
   PyModule_AddObject (m, "Dir", (PyObject *) &smbc_DirType);
+
+  // File type
+  smbc_FileType.tp_new = PyType_GenericNew;
+  if (PyType_Ready (&smbc_FileType) < 0)
+    return;
+
+  PyModule_AddObject (m, "File", (PyObject *) &smbc_FileType);
 
   // Dirent type
   smbc_DirentType.tp_new = PyType_GenericNew;

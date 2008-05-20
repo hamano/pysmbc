@@ -21,6 +21,7 @@
 #include "smbcmodule.h"
 #include "context.h"
 #include "dir.h"
+#include "file.h"
 
 Context *current_context;
 
@@ -161,6 +162,42 @@ Context_dealloc (Context *self)
     }
 
   self->ob_type->tp_free ((PyObject *) self);
+}
+
+static PyObject *
+Context_open (Context *self, PyObject *args)
+{
+  PyObject *largs, *lkwlist;
+  PyObject *uri;
+  PyObject *flags;
+  PyObject *mode;
+  PyObject *file;
+
+  debugprintf ("%p -> Context_open()\n", self->context);
+  if (!PyArg_ParseTuple (args, "OOO", &uri, &flags, &mode))
+    {
+      debugprintf ("%p <- Context_open() EXCEPTION\n", self->context);
+      return NULL;
+    }
+
+  largs = Py_BuildValue ("()");
+  lkwlist = PyDict_New ();
+  PyDict_SetItemString (lkwlist, "context", (PyObject *) self);
+  PyDict_SetItemString (lkwlist, "uri", uri);
+  PyDict_SetItemString (lkwlist, "flags", flags);
+  PyDict_SetItemString (lkwlist, "mode", mode);
+  file = PyType_GenericNew (&smbc_FileType, largs, lkwlist);
+  if (smbc_FileType.tp_init (file, largs, lkwlist) < 0)
+    {
+      smbc_FileType.tp_dealloc (file);
+      debugprintf ("%p <- Context_open() EXCEPTION\n", self->context);
+      return NULL;
+    }
+
+  Py_DECREF (largs);
+  Py_DECREF (lkwlist);
+  debugprintf ("%p <- Context_open() = File\n", self->context);
+  return file;
 }
 
 static PyObject *
@@ -314,6 +351,13 @@ PyMethodDef Context_methods[] =
       "@type uri: string\n"
       "@param uri: URI to open\n"
       "@return: a L{smbc.Dir} object for the URI" },
+
+    { "open",
+      (PyCFunction) Context_open, METH_VARARGS,
+      "open(uri) -> int\n\n"
+      "@type uri: string\n"
+      "@param uri: URI to open\n"
+      "@return: a L{smbc.File} object for the URI" },
 
     { NULL } /* Sentinel */
   };

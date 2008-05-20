@@ -4,5 +4,6 @@ setup (name="smbc", version="1.0",
                               ["smbcmodule.c",
                                "context.c",
                                "dir.c",
+                               "file.c",
                                "smbcdirent.c"],
                               libraries=["smbclient"])])
