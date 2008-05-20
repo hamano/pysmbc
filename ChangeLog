@@ -1,5 +1,13 @@
 2008-05-20  Tim Waugh  <twaugh@redhat.com>
 
+	* Makefile: Version 1.0.2.
+
+2008-05-20  Tim Waugh  <twaugh@redhat.com>
+
+	* context.c: Properties don't begin with capital letters.
+
+2008-05-20  Tim Waugh  <twaugh@redhat.com>
+
 	* Makefile: Version 1.0.1.
 
 2008-05-20  Tim Waugh  <twaugh@redhat.com>
