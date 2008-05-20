@@ -321,25 +321,25 @@ Context_setOptionNoAutoAnonymousLogin (Context *self, PyObject *value,
 
 PyGetSetDef Context_getseters[] =
   {
-    { "Debug",
+    { "debug",
       (getter) Context_getDebug,
       (setter) Context_setDebug,
       "Debug level.",
       NULL },
 
-    { "FunctionAuthData",
+    { "functionAuthData",
       (getter) NULL,
       (setter) Context_setFunctionAuthData,
       "Function for obtaining authentication data.",
       NULL },
 
-    { "OptionDebugToStderr",
+    { "optionDebugToStderr",
       (getter) Context_getOptionDebugToStderr,
       (setter) Context_setOptionDebugToStderr,
       "Whether to log to standard error instead of standard output.",
       NULL },
 
-    { "OptionNoAutoAnonymousLogin",
+    { "optionNoAutoAnonymousLogin",
       (getter) Context_getOptionNoAutoAnonymousLogin,
       (setter) Context_setOptionNoAutoAnonymousLogin,
       "Whether to automatically select anonymous login.",

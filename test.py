@@ -142,8 +142,8 @@ class Browser:
         w.show_all ()
 
         ctx = smbc.Context (debug=1)
-        ctx.FunctionAuthData = self.auth_callback
-        ctx.OptionNoAutoAnonymousLogin = True
+        ctx.functionAuthData = self.auth_callback
+        ctx.optionNoAutoAnonymousLogin = True
         self.smbc = ctx
         self.auth = AuthContext (w)
         try:
