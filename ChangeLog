@@ -1,5 +1,9 @@
 2008-05-20  Tim Waugh  <twaugh@redhat.com>
 
+	* Makefile: Version 1.0.1.
+
+2008-05-20  Tim Waugh  <twaugh@redhat.com>
+
 	* context.c (auth_fn): User user data for storing Context object.
 
 	* context.c (Context_open): New method.
