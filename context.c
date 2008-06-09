@@ -129,6 +129,7 @@ Context_init (Context *self, PyObject *args, PyObject *kwds)
 
   debugprintf ("-> Context_init ()\n");
 
+  errno = 0;
   ctx = smbc_new_context ();
   if (ctx == NULL)
     {

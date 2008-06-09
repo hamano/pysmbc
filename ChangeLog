@@ -1,3 +1,9 @@
+2008-06-09  Tim  <tim@localhost.localdomain>
+
+	* dir.c (Dir_init): Initialise errno before library call.
+	(Dir_getdents): Likewise.
+	* context.c (Context_init): Likewise.
+
 2008-05-20  Tim Waugh  <twaugh@redhat.com>
 
 	* Makefile: Version 1.0.2.

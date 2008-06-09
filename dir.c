@@ -74,6 +74,7 @@ Dir_init (Dir *self, PyObject *args, PyObject *kwds)
   ctx = (Context *) ctxobj;
   self->context = ctx;
   fn = smbc_getFunctionOpendir (ctx->context);
+  errno = 0;
   dir = (*fn) (ctx->context, uri);
   if (dir == NULL)
     {
@@ -121,6 +122,7 @@ Dir_getdents (Dir *self)
   dirp = (struct smbc_dirent *) dirbuf;
   listobj = PyList_New (0);
   fn = smbc_getFunctionGetdents (ctx);
+  errno = 0;
   while ((dirlen = (*fn) (ctx, self->dir,
 			  (struct smbc_dirent *) dirbuf,
 			  sizeof (dirbuf))) != 0)
