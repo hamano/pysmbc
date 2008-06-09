@@ -1,5 +1,5 @@
 NAME=pysmbc
-VERSION=1.0.2
+VERSION=1.0.3
 
 SOURCES=smbcmodule.c smbcmodule.h context.c context.h dir.c dir.h \
 	file.c file.h smbcdirent.c smbcdirent.h setup.py

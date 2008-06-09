@@ -1,5 +1,9 @@
 2008-06-09  Tim Waugh  <twaugh@redhat.com>
 
+	* Makefile: Version 1.0.3.
+
+2008-06-09  Tim Waugh  <twaugh@redhat.com>
+
 	* dir.c (Dir_init): Initialise errno before library call.
 	(Dir_getdents): Likewise.
 	* context.c (Context_init): Likewise.
