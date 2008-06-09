@@ -1,4 +1,4 @@
-2008-06-09  Tim  <tim@localhost.localdomain>
+2008-06-09  Tim Waugh  <twaugh@redhat.com>
 
 	* dir.c (Dir_init): Initialise errno before library call.
 	(Dir_getdents): Likewise.
