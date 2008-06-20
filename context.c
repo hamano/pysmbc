@@ -290,6 +290,35 @@ Context_setNetbiosName (Context *self, PyObject *value, void *closure)
   return 0;
 }
 
+static PyObject *
+Context_getWorkgroup (Context *self, void *closure)
+{
+  const char *workgroup = smbc_getWorkgroup (self->context);
+  return PyString_FromString (workgroup);
+}
+
+static int
+Context_setWorkgroup (Context *self, PyObject *value, void *closure)
+{
+  char *workgroup;
+
+  if (!PyString_Check (value))
+    {
+      PyErr_SetString (PyExc_TypeError, "must be string");
+      return -1;
+    }
+
+  workgroup = strdup (PyString_AsString (value));
+  if (!workgroup)
+    {
+      return -1;
+    }
+
+  smbc_setWorkgroup (self->context, workgroup);
+  // Don't free workgroup: the API function just takes a reference(!)
+  return 0;
+}
+
 static int
 Context_setFunctionAuthData (Context *self, PyObject *value, void *closure)
 {
@@ -361,6 +390,12 @@ PyGetSetDef Context_getseters[] =
       (getter) Context_getNetbiosName,
       (setter) Context_setNetbiosName,
       "Netbios name used for making connections.",
+      NULL },
+
+    { "workgroup",
+      (getter) Context_getWorkgroup,
+      (setter) Context_setWorkgroup,
+      "Workgroup used for making connections.",
       NULL },
 
     { "functionAuthData",

@@ -3,6 +3,7 @@ NEWS
 
 New in 1.0.4:
 
+* Context.workgroup
 * Context.netbiosName
 
 New in 1.0.2:

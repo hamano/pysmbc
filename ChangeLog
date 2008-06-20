@@ -1,5 +1,11 @@
 2008-06-20  Tim Waugh  <twaugh@redhat.com>
 
+	* context.c (Context_getWorkgroup, Context_setWorkgroup): New
+	getter/setter for workgroup.
+	(Context_getseters): New attribute workgroup.
+
+2008-06-20  Tim Waugh  <twaugh@redhat.com>
+
 	* context.c (Context_getNetbiosName, Context_setNetbiosName): New
 	getter/setter for netbiosName.
 	(Context_getseters): New attribute netbiosName.
