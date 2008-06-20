@@ -1,3 +1,9 @@
+2008-06-20  Tim Waugh  <twaugh@redhat.com>
+
+	* context.c (Context_getNetbiosName, Context_setNetbiosName): New
+	getter/setter for netbiosName.
+	(Context_getseters): New attribute netbiosName.
+
 2008-06-09  Tim Waugh  <twaugh@redhat.com>
 
 	* Makefile: Version 1.0.3.

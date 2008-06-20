@@ -1,6 +1,10 @@
 NEWS
 ----
 
+New in 1.0.4:
+
+* Context.netbiosName
+
 New in 1.0.2:
 
 * Context.Debug -> Context.debug

@@ -261,6 +261,35 @@ Context_setDebug (Context *self, PyObject *value, void *closure)
   return 0;
 }
 
+static PyObject *
+Context_getNetbiosName (Context *self, void *closure)
+{
+  const char *netbios_name = smbc_getNetbiosName (self->context);
+  return PyString_FromString (netbios_name);
+}
+
+static int
+Context_setNetbiosName (Context *self, PyObject *value, void *closure)
+{
+  char *name;
+
+  if (!PyString_Check (value))
+    {
+      PyErr_SetString (PyExc_TypeError, "must be string");
+      return -1;
+    }
+
+  name = strdup (PyString_AsString (value));
+  if (!name)
+    {
+      return -1;
+    }
+
+  smbc_setNetbiosName (self->context, name);
+  // Don't free name: the API function just takes a reference(!)
+  return 0;
+}
+
 static int
 Context_setFunctionAuthData (Context *self, PyObject *value, void *closure)
 {
@@ -326,6 +355,12 @@ PyGetSetDef Context_getseters[] =
       (getter) Context_getDebug,
       (setter) Context_setDebug,
       "Debug level.",
+      NULL },
+
+    { "netbiosName",
+      (getter) Context_getNetbiosName,
+      (setter) Context_setNetbiosName,
+      "Netbios name used for making connections.",
       NULL },
 
     { "functionAuthData",
