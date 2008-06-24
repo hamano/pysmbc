@@ -1,3 +1,8 @@
+2008-06-24  Tim Waugh  <twaugh@redhat.com>
+
+	* context.c (Context_init): Set the debug level during the Context
+	constructor.
+
 2008-06-20  Tim Waugh  <twaugh@redhat.com>
 
 	* Makefile: Version 1.0.4.

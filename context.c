@@ -100,7 +100,7 @@ static int
 Context_init (Context *self, PyObject *args, PyObject *kwds)
 {
   PyObject *auth = NULL;
-  int debug = 0;
+  int debug = -1;
   unsigned int flags = 0;
   SMBCCTX *ctx;
   static char *kwlist[] = 
@@ -148,6 +148,9 @@ Context_init (Context *self, PyObject *args, PyObject *kwds)
       debugprintf ("<- Context_init() EXCEPTION\n");
       return -1;
     }
+
+  if (debug != -1)
+    smbc_setDebug (ctx, debug);
 
   self->context = ctx;
   smbc_setOptionUserData (ctx, self);
