@@ -146,6 +146,7 @@ class Browser:
         ctx.optionNoAutoAnonymousLogin = True
         self.smbc = ctx
         self.auth = AuthContext (w)
+        workgroups = None
         try:
             while self.auth.perform_authentication () > 0:
                 try:
@@ -153,9 +154,7 @@ class Browser:
                 except Exception, e:
                     self.auth.failed (e)
         except RuntimeError, (e, s):
-            if e == errno.ENOENT:
-                workgroups = None
-            else:
+            if e != errno.ENOENT:
                 raise
 
         if workgroups:
@@ -201,6 +200,7 @@ class Browser:
 
             uri = "smb://%s" % entry.name
             self.auth = AuthContext (self.main)
+            servers = None
             try:
                 while self.auth.perform_authentication () > 0:
                     try:
@@ -208,9 +208,7 @@ class Browser:
                     except Exception, e:
                         self.auth.failed (e)
             except RuntimeError, (e, s):
-                if e == errno.ENOENT:
-                    servers = None
-                else:
+                if e != errno.ENOENT:
                     raise
 
             if servers:
@@ -235,6 +233,7 @@ class Browser:
             uri = "smb://%s" % entry.name
 
             self.auth = AuthContext (self.main)
+            shares = None
             try:
                 while self.auth.perform_authentication () > 0:
                     try:
@@ -242,7 +241,6 @@ class Browser:
                     except Exception, e:
                         self.auth.failed (e)
             except RuntimeError, (e, s):
-                shares = None
                 if e != errno.EACCES and e != errno.EPERM:
                     del self.expanding_row
                     raise
