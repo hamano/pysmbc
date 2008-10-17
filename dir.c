@@ -114,12 +114,10 @@ Dir_getdents (Dir *self)
   SMBCCTX *ctx;
   char dirbuf[1024];
   smbc_getdents_fn fn;
-  struct smbc_dirent *dirp;
   int dirlen;
 
   debugprintf ("-> Dir_getdents()\n");
   ctx = self->context->context;
-  dirp = (struct smbc_dirent *) dirbuf;
   listobj = PyList_New (0);
   fn = smbc_getFunctionGetdents (ctx);
   errno = 0;
@@ -127,6 +125,8 @@ Dir_getdents (Dir *self)
 			  (struct smbc_dirent *) dirbuf,
 			  sizeof (dirbuf))) != 0)
     {
+      struct smbc_dirent *dirp;
+
       debugprintf ("dirlen = %d\n", dirlen);
       if (dirlen < 0)
 	{
@@ -136,6 +136,7 @@ Dir_getdents (Dir *self)
 	  return NULL;
 	}
 
+      dirp = (struct smbc_dirent *) dirbuf;
       while (dirlen > 0)
 	{
 	  PyObject *dent;

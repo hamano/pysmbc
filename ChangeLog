@@ -1,3 +1,8 @@
+2008-10-17  Tim Waugh  <twaugh@redhat.com>
+
+	* dir.c (Dir_getdents): Fixed crash when getdents provides more
+	than one batch of entries (bug #465975).
+
 2008-10-08  Tim Waugh  <twaugh@redhat.com>
 
 	* test.py (Browser.__init__): Prevent unbound local variable
