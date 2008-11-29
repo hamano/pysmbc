@@ -3,3 +3,4 @@ SMB bindings for Python
 
 These Python bindings are intended to wrap the libsmbclient API.
 
+Currently libsmbclient 3.2.x is required.
