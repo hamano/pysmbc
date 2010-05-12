@@ -178,23 +178,27 @@ Context_open (Context *self, PyObject *args)
 {
   PyObject *largs, *lkwlist;
   PyObject *uri;
-  PyObject *flags;
-  PyObject *mode;
   PyObject *file;
+  int flags = 0;
+  int mode = 0;
+  PyObject *lflags;
+  PyObject *lmode;
 
   debugprintf ("%p -> Context_open()\n", self->context);
-  if (!PyArg_ParseTuple (args, "OOO", &uri, &flags, &mode))
+  if (!PyArg_ParseTuple (args, "O|ii", &uri, &flags, &mode))
     {
       debugprintf ("%p <- Context_open() EXCEPTION\n", self->context);
       return NULL;
     }
 
+  lflags = Py_BuildValue("i", flags);
+  lmode = Py_BuildValue("i", mode);
   largs = Py_BuildValue ("()");
   lkwlist = PyDict_New ();
   PyDict_SetItemString (lkwlist, "context", (PyObject *) self);
   PyDict_SetItemString (lkwlist, "uri", uri);
-  PyDict_SetItemString (lkwlist, "flags", flags);
-  PyDict_SetItemString (lkwlist, "mode", mode);
+  PyDict_SetItemString (lkwlist, "flags", lflags);
+  PyDict_SetItemString (lkwlist, "mode", lmode);
   file = PyType_GenericNew (&smbc_FileType, largs, lkwlist);
   if (smbc_FileType.tp_init (file, largs, lkwlist) < 0)
     {
@@ -203,6 +207,8 @@ Context_open (Context *self, PyObject *args)
       return NULL;
     }
 
+  Py_DECREF (lflags);
+  Py_DECREF (lmode);
   Py_DECREF (largs);
   Py_DECREF (lkwlist);
   debugprintf ("%p <- Context_open() = File\n", self->context);

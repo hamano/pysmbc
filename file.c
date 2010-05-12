@@ -49,8 +49,8 @@ File_init (File *self, PyObject *args, PyObject *kwds)
   PyObject *ctxobj;
   Context *ctx;
   const char *uri;
-  long flags;
-  long mode;
+  int flags = 0;
+  int mode = 0;
   smbc_open_fn fn;
   SMBCFILE *file;
   static char *kwlist[] = 
@@ -62,7 +62,7 @@ File_init (File *self, PyObject *args, PyObject *kwds)
       NULL
     };
 
-  if (!PyArg_ParseTupleAndKeywords (args, kwds, "Osii", kwlist, &ctxobj,
+  if (!PyArg_ParseTupleAndKeywords (args, kwds, "Os|ii", kwlist, &ctxobj,
 				    &uri, &flags, &mode))
     return -1;
 
