@@ -20,8 +20,6 @@
 #ifndef HAVE_FILE_H
 #define HAVE_FILE_H
 
-#include <Python.h>
-
 extern PyMethodDef File_methods[];
 extern PyTypeObject smbc_FileType;
 

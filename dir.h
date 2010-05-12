@@ -20,8 +20,6 @@
 #ifndef HAVE_DIR_H
 #define HAVE_DIR_H
 
-#include <Python.h>
-
 extern PyMethodDef Dir_methods[];
 extern PyTypeObject smbc_DirType;
 

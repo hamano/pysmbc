@@ -20,8 +20,6 @@
 #ifndef HAVE_CONTEXT_H
 #define HAVE_CONTEXT_H
 
-#include <Python.h>
-
 extern PyMethodDef Context_methods[];
 extern PyTypeObject smbc_ContextType;
 

@@ -20,8 +20,6 @@
 #ifndef HAVE_SMBCDIRENT_H
 #define HAVE_SMBCDIRENT_H
 
-#include <Python.h>
-
 extern PyMethodDef Dirent_methods[];
 extern PyTypeObject smbc_DirentType;
 
