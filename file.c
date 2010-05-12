@@ -112,8 +112,45 @@ File_dealloc (File *self)
   self->ob_type->tp_free ((PyObject *) self);
 }
 
+static PyObject *
+File_read(File *self, PyObject *args)
+{
+  Context *ctx = self->context;
+  size_t size = 0;
+  smbc_read_fn fn;
+  char *buf;
+  ssize_t len;
+  PyObject *ret;
+  smbc_fstat_fn fn_fstat;
+  struct stat st;
+
+  if(!PyArg_ParseTuple(args, "|k", &size)){
+	return NULL;
+  }
+  fn = smbc_getFunctionRead(ctx->context);
+
+  if(size == 0){
+	fn_fstat = smbc_getFunctionFstat(ctx->context);
+	(*fn_fstat)(ctx->context, self->file, &st);
+	size = st.st_size;
+  }
+
+  buf = (char *)malloc(size);
+  if(!buf){
+	PyErr_SetString(PyExc_MemoryError, "malloc failed.");
+	return NULL;
+  }
+  len = (*fn)(ctx->context, self->file, buf, size);
+  ret = PyString_FromStringAndSize(buf, len);
+  free(buf);
+
+  return ret;
+}
+
+
 PyMethodDef File_methods[] =
   {
+	{"read", (PyCFunction)File_read, METH_VARARGS, NULL},
     { NULL } /* Sentinel */
   };
 
