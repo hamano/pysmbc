@@ -249,6 +249,24 @@ Context_opendir (Context *self, PyObject *args)
 }
 
 static PyObject *
+Context_mkdir(Context *self, PyObject *args)
+{
+  int ret;
+  char *uri = NULL;
+  unsigned int mode = 0;
+  smbc_mkdir_fn fn;
+
+  if(!PyArg_ParseTuple (args, "s|I", &uri, &mode)) {
+	return NULL;
+  }
+
+  fn = smbc_getFunctionMkdir(self->context);
+  ret = (*fn)(self->context, uri, mode);
+
+  return PyInt_FromLong(ret);
+}
+
+static PyObject *
 Context_getDebug (Context *self, void *closure)
 {
   int d = smbc_getDebug (self->context);
@@ -440,10 +458,18 @@ PyMethodDef Context_methods[] =
 
     { "open",
       (PyCFunction) Context_open, METH_VARARGS,
-      "open(uri) -> int\n\n"
+      "open(uri) -> File\n\n"
       "@type uri: string\n"
       "@param uri: URI to open\n"
       "@return: a L{smbc.File} object for the URI" },
+
+    { "mkdir",
+      (PyCFunction) Context_mkdir, METH_VARARGS,
+      "mkdir(uri, mode) -> int\n\n"
+      "@type uri: string\n"
+      "@param uri: URI to mkdir\n"
+      "@param mode: Specifies the permissions to use.\n"
+      "@return: 0 on success, < 0 on error" },
 
     { NULL } /* Sentinel */
   };
