@@ -18,7 +18,8 @@ class TestContext(unittest.TestCase):
             assert(entry.smbc_type == 1)
 
     def testServer(self):
-        list = self.ctx.opendir('smb:///').getdents()
+        uri = 'smb://' + settings.WORKGROUP
+        list = self.ctx.opendir(uri).getdents()
         assert(len(list) > 0)
         for entry in list:
             assert(entry.smbc_type == 2)
