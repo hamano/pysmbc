@@ -29,6 +29,8 @@ static PyMethodDef SmbcMethods[] = {
   { NULL, NULL, 0, NULL }
 };
 
+PyObject *PermissionError;
+
 void
 initsmbc (void)
 {
@@ -80,6 +82,10 @@ initsmbc (void)
   INT_CONSTANT (SMB_CTX_, FLAG_USE_KERBEROS);
   INT_CONSTANT (SMB_CTX_, FLAG_FALLBACK_AFTER_KERBEROS);
   INT_CONSTANT (SMBCCTX_, FLAG_NO_AUTO_ANONYMOUS_LOGON);
+
+  PermissionError = PyErr_NewException("smbc.PermissionError", NULL, NULL);
+  Py_INCREF(PermissionError);
+  PyModule_AddObject(m, "PermissionError", PermissionError);
 }
 
 ///////////////

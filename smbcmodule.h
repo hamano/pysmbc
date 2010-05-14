@@ -32,4 +32,6 @@
 
 extern void debugprintf (const char *fmt, ...) FORMAT ((__printf__, 1, 2));
 
+extern PyObject *PermissionError;
+
 #endif /* HAVE_SMBCMODULE_H */
