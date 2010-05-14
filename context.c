@@ -262,7 +262,22 @@ Context_mkdir(Context *self, PyObject *args)
 
   fn = smbc_getFunctionMkdir(self->context);
   ret = (*fn)(self->context, uri, mode);
+  return PyInt_FromLong(ret);
+}
 
+static PyObject *
+Context_rmdir(Context *self, PyObject *args)
+{
+  int ret;
+  char *uri = NULL;
+  smbc_rmdir_fn fn;
+
+  if(!PyArg_ParseTuple (args, "s", &uri)) {
+	return NULL;
+  }
+
+  fn = smbc_getFunctionRmdir(self->context);
+  ret = (*fn)(self->context, uri);
   return PyInt_FromLong(ret);
 }
 
@@ -469,6 +484,13 @@ PyMethodDef Context_methods[] =
       "@type uri: string\n"
       "@param uri: URI to mkdir\n"
       "@param mode: Specifies the permissions to use.\n"
+      "@return: 0 on success, < 0 on error" },
+
+    { "rmdir",
+      (PyCFunction) Context_rmdir, METH_VARARGS,
+      "rmdir(uri) -> int\n\n"
+      "@type uri: string\n"
+      "@param uri: URI to rmdir\n"
       "@return: 0 on success, < 0 on error" },
 
     { NULL } /* Sentinel */
