@@ -1,2 +1,3 @@
 build
 smbc.so
+tests/*.pyc
