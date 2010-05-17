@@ -278,6 +278,37 @@ Context_rmdir(Context *self, PyObject *args)
 }
 
 static PyObject *
+Context_stat(Context *self, PyObject *args)
+{
+  int ret;
+  char *uri = NULL;
+  smbc_stat_fn fn;
+  struct stat st;
+
+  if(!PyArg_ParseTuple (args, "s", &uri)) {
+	return NULL;
+  }
+
+  fn = smbc_getFunctionStat(self->context);
+  ret = (*fn)(self->context, uri, &st);
+  if(ret < 0){
+	PyErr_SetString(PyExc_RuntimeError, "No such file or directory");
+	return NULL;
+  }
+  return Py_BuildValue("(IkkkIIkkkk)",
+					   st.st_mode,
+					   st.st_ino,
+					   st.st_dev,
+					   st.st_nlink,
+					   st.st_uid,
+					   st.st_gid,
+					   st.st_size,
+					   st.st_atime,
+					   st.st_mtime,
+					   st.st_ctime);
+}
+
+static PyObject *
 Context_getDebug (Context *self, void *closure)
 {
   int d = smbc_getDebug (self->context);
@@ -488,6 +519,13 @@ PyMethodDef Context_methods[] =
       "@type uri: string\n"
       "@param uri: URI to rmdir\n"
       "@return: 0 on success, < 0 on error" },
+
+    { "stat",
+      (PyCFunction) Context_stat, METH_VARARGS,
+      "stat(uri) -> tuple\n\n"
+      "@type uri: string\n"
+      "@param uri: URI to get stat information\n"
+      "@return: stat information" },
 
     { NULL } /* Sentinel */
   };
