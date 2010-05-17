@@ -1,6 +1,8 @@
 /* -*- Mode: C; c-file-style: "gnu" -*-
  * pysmbc - Python bindings for libsmbclient
- * Copyright (C) 2002, 2005, 2006, 2007, 2008  Tim Waugh <twaugh@redhat.com>
+ * Copyright (C) 2002, 2005, 2006, 2007, 2008, 2010  Red Hat, Inc
+ * Authors:
+ *  Tim Waugh <twaugh@redhat.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -116,7 +118,7 @@ static PyObject *
 File_fstat(File *self, PyObject *args)
 {
   Context *ctx = self->context;
-  smbc_stat_fn fn;
+  smbc_fstat_fn fn;
   struct stat st;
   int ret;
 
