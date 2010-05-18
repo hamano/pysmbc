@@ -10,3 +10,4 @@ include dir.h
 include file.h
 include smbcdirent.h
 include smbcmodule.h
+include test.py
