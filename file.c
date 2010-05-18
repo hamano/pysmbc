@@ -174,10 +174,29 @@ File_read(File *self, PyObject *args)
   return ret;
 }
 
+static PyObject *
+File_write(File *self, PyObject *args)
+{
+  Context *ctx = self->context;
+  int size = 0;
+  smbc_write_fn fn;
+  char *buf;
+  ssize_t len;
+
+  if(!PyArg_ParseTuple(args, "s#", &buf, &size)){
+	return NULL;
+  }
+  fn = smbc_getFunctionWrite(ctx->context);
+  len = (*fn)(ctx->context, self->file, buf, size);
+
+  return PyInt_FromLong(len);
+}
+
 PyMethodDef File_methods[] =
   {
 	{"fstat", (PyCFunction)File_fstat, METH_NOARGS, NULL},
 	{"read", (PyCFunction)File_read, METH_VARARGS, NULL},
+	{"write", (PyCFunction)File_write, METH_VARARGS, NULL},
     { NULL } /* Sentinel */
   };
 
