@@ -11,7 +11,7 @@ doc: smbc.so
 	epydoc -o html --html $<
 
 clean:
-	-rm -rf build smbc.so *.pyc *~
+	-rm -rf build smbc.so *.pyc tests/*.pyc *~ tests/*~
 
 dist:
 	python setup.py sdist $(SDIST_ARGS)
