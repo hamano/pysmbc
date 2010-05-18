@@ -1,6 +1,6 @@
 from distutils.core import setup, Extension
 setup (name="pysmbc",
-       version="1.0.6",
+       version="1.0.7",
        description="Python bindings for libsmbclient",
        author="Tim Waugh",
        author_email="twaugh@redhat.com",
