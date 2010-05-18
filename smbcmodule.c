@@ -52,10 +52,8 @@ initsmbc (void)
   PyModule_AddObject (m, "Dir", (PyObject *) &smbc_DirType);
 
   // File type
-  smbc_FileType.tp_new = PyType_GenericNew;
   if (PyType_Ready (&smbc_FileType) < 0)
     return;
-
   PyModule_AddObject (m, "File", (PyObject *) &smbc_FileType);
 
   // Dirent type

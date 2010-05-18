@@ -196,7 +196,10 @@ Context_open (Context *self, PyObject *args)
   PyDict_SetItemString (lkwlist, "uri", uri);
   PyDict_SetItemString (lkwlist, "flags", lflags);
   PyDict_SetItemString (lkwlist, "mode", lmode);
-  file = PyType_GenericNew (&smbc_FileType, largs, lkwlist);
+  file = smbc_FileType.tp_new(&smbc_FileType, largs, lkwlist);
+  if(!file){
+	return PyErr_NoMemory();
+  }
   if (smbc_FileType.tp_init (file, largs, lkwlist) < 0)
     {
       smbc_FileType.tp_dealloc (file);
