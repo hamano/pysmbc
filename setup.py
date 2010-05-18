@@ -10,7 +10,7 @@ setup (name="pysmbc",
        download_url="http://cyberelk.net/tim/data/pysmbc/",
        classifiers=[
         "Intended Audience :: Developers",
-        "Topic :: Software Development:: Libraries :: Python Modules",
+        "Topic :: Software Development :: Libraries :: Python Modules",
         "License :: OSI Approved :: GNU General Public License (GPL)",
         "Development Status :: 5 - Production/Stable",
         "Operating System :: Unix",
