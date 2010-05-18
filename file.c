@@ -1,6 +1,7 @@
 /* -*- Mode: C; c-file-style: "gnu" -*-
  * pysmbc - Python bindings for libsmbclient
  * Copyright (C) 2002, 2005, 2006, 2007, 2008, 2010  Red Hat, Inc
+ * Copyright (C) 2010  Open Source Solution Technology Corporation
  * Authors:
  *  Tim Waugh <twaugh@redhat.com>
  *  Tsukasa Hamano <hamano@osstech.co.jp>
