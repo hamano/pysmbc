@@ -192,11 +192,27 @@ File_write(File *self, PyObject *args)
   return PyInt_FromLong(len);
 }
 
+static PyObject *
+File_close(File *self, PyObject *args)
+{
+  Context *ctx = self->context;
+  smbc_close_fn fn;
+  int ret = 0;
+
+  fn = smbc_getFunctionClose(ctx->context);
+  if(self->file){
+	ret = (*fn)(ctx->context, self->file);
+	self->file = NULL;
+  }
+  return PyInt_FromLong(ret);
+}
+
 PyMethodDef File_methods[] =
   {
 	{"fstat", (PyCFunction)File_fstat, METH_NOARGS, NULL},
 	{"read", (PyCFunction)File_read, METH_VARARGS, NULL},
 	{"write", (PyCFunction)File_write, METH_VARARGS, NULL},
+	{"close", (PyCFunction)File_close, METH_NOARGS, NULL},
     { NULL } /* Sentinel */
   };
 
