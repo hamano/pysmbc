@@ -1,11 +1,6 @@
 NAME=pysmbc
 VERSION:=$(shell python setup.py --version)
 
-SOURCES=smbcmodule.c smbcmodule.h context.c context.h dir.c dir.h \
-	file.c file.h smbcdirent.c smbcdirent.h setup.py
-
-DIST=Makefile test.py COPYING NEWS README TODO ChangeLog
-
 smbc.so: $(SOURCES)
 	python setup.py build
 	mv build/lib*/$@ .
@@ -18,10 +13,7 @@ clean:
 	-rm -rf build smbc.so *.pyc *~
 
 dist:
-	mkdir $(NAME)-$(VERSION)
-	cp -a $(SOURCES) $(DIST) $(NAME)-$(VERSION)
-	tar jcf $(NAME)-$(VERSION).tar.bz2 $(NAME)-$(VERSION)
-	rm -rf $(NAME)-$(VERSION) $(NAME)
+	python setup.py sdist --formats=bztar -d.
 
 install:
 	ROOT= ; \
