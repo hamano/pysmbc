@@ -1,0 +1,13 @@
+include MANIFEST.in
+include Makefile
+include COPYING
+include NEWS
+include README
+include TODO
+include tests/*.py
+include context.h
+include dir.h
+include file.h
+include smbcdirent.h
+include smbcmodule.h
+include test.py
