@@ -1,5 +1,5 @@
 NAME=pysmbc
-VERSION=1.0.6
+VERSION:=$(shell python setup.py --version)
 
 SOURCES=smbcmodule.c smbcmodule.h context.c context.h dir.c dir.h \
 	file.c file.h smbcdirent.c smbcdirent.h setup.py
@@ -18,9 +18,7 @@ clean:
 	-rm -rf build smbc.so *.pyc *~
 
 dist:
-	#svn export . $(NAME)
 	mkdir $(NAME)-$(VERSION)
-	#cd $(NAME); cp -a $(SOURCES) $(DIST) ../$(NAME)-$(VERSION); cd ..
 	cp -a $(SOURCES) $(DIST) $(NAME)-$(VERSION)
 	tar jcf $(NAME)-$(VERSION).tar.bz2 $(NAME)-$(VERSION)
 	rm -rf $(NAME)-$(VERSION) $(NAME)
