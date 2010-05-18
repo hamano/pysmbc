@@ -1,5 +1,6 @@
 NAME=pysmbc
 VERSION:=$(shell python setup.py --version)
+SDIST_ARGS=--formats=bztar -d.
 
 smbc.so: $(SOURCES)
 	python setup.py build
@@ -13,7 +14,10 @@ clean:
 	-rm -rf build smbc.so *.pyc *~
 
 dist:
-	python setup.py sdist --formats=bztar -d.
+	python setup.py sdist $(SDIST_ARGS)
+
+upload:
+	python setup.py sdist $(SDIST_ARGS) upload -s
 
 install:
 	ROOT= ; \
