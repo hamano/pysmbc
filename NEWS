@@ -1,6 +1,18 @@
 NEWS
 ----
 
+New in 1.0.7:
+
+* Context.open: omissible flags and mode
+* File: omissible flags and mode
+* File.read()
+* smbc.PermissionError
+* Context.mkdir()
+* Context.stat()
+* File.fstat()
+* File.write()
+* File.close()
+
 New in 1.0.4:
 
 * Context.workgroup
