@@ -26,13 +26,6 @@
 #include "context.h"
 #include "file.h"
 
-typedef struct
-{
-  PyObject_HEAD
-  Context *context;
-  SMBCFILE *file;
-} File;
-
 //////////
 // File //
 //////////
@@ -53,7 +46,7 @@ File_init (File *self, PyObject *args, PyObject *kwds)
 {
   PyObject *ctxobj;
   Context *ctx;
-  const char *uri;
+  char *uri = NULL;
   int flags = 0;
   int mode = 0;
   smbc_open_fn fn;
@@ -67,7 +60,7 @@ File_init (File *self, PyObject *args, PyObject *kwds)
       NULL
     };
 
-  if (!PyArg_ParseTupleAndKeywords (args, kwds, "Os|ii", kwlist, &ctxobj,
+  if (!PyArg_ParseTupleAndKeywords (args, kwds, "O|sii", kwlist, &ctxobj,
 				    &uri, &flags, &mode))
     return -1;
 
@@ -82,15 +75,16 @@ File_init (File *self, PyObject *args, PyObject *kwds)
   Py_INCREF (ctxobj);
   ctx = (Context *) ctxobj;
   self->context = ctx;
-  fn = smbc_getFunctionOpen (ctx->context);
-  file = (*fn) (ctx->context, uri, (int) flags, (mode_t) mode);
-  if (file == NULL)
-    {
-      PyErr_SetFromErrno (PyExc_RuntimeError);
-      return -1;
-    }
-
-  self->file = file;
+  if(uri){
+	fn = smbc_getFunctionOpen (ctx->context);
+	file = (*fn) (ctx->context, uri, (int) flags, (mode_t) mode);
+	if (file == NULL)
+	  {
+		PyErr_SetFromErrno (PyExc_RuntimeError);
+		return -1;
+	  }
+	self->file = file;
+  }
   debugprintf ("%p open()\n", self->file);
   debugprintf ("%p <- File_init() = 0\n", self->file);
   return 0;

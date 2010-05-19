@@ -174,45 +174,40 @@ static PyObject *
 Context_open (Context *self, PyObject *args)
 {
   PyObject *largs, *lkwlist;
-  PyObject *uri;
-  PyObject *file;
+  char *uri;
+  File *file;
   int flags = 0;
   int mode = 0;
-  PyObject *lflags;
-  PyObject *lmode;
+  smbc_open_fn fn;
 
   debugprintf ("%p -> Context_open()\n", self->context);
-  if (!PyArg_ParseTuple (args, "O|ii", &uri, &flags, &mode))
-    {
+  if(!PyArg_ParseTuple (args, "s|ii", &uri, &flags, &mode)){
       debugprintf ("%p <- Context_open() EXCEPTION\n", self->context);
       return NULL;
-    }
+  }
 
-  lflags = Py_BuildValue("i", flags);
-  lmode = Py_BuildValue("i", mode);
   largs = Py_BuildValue ("()");
   lkwlist = PyDict_New ();
   PyDict_SetItemString (lkwlist, "context", (PyObject *) self);
-  PyDict_SetItemString (lkwlist, "uri", uri);
-  PyDict_SetItemString (lkwlist, "flags", lflags);
-  PyDict_SetItemString (lkwlist, "mode", lmode);
-  file = smbc_FileType.tp_new(&smbc_FileType, largs, lkwlist);
+  file = (File *)smbc_FileType.tp_new(&smbc_FileType, largs, lkwlist);
   if(!file){
 	return PyErr_NoMemory();
   }
-  if (smbc_FileType.tp_init (file, largs, lkwlist) < 0)
-    {
-      smbc_FileType.tp_dealloc (file);
-      debugprintf ("%p <- Context_open() EXCEPTION\n", self->context);
-      return NULL;
-    }
-
-  Py_DECREF (lflags);
-  Py_DECREF (lmode);
+  if (smbc_FileType.tp_init ((PyObject *)file, largs, lkwlist) < 0){
+	smbc_FileType.tp_dealloc((PyObject *)file);
+	debugprintf ("%p <- Context_open() EXCEPTION\n", self->context);
+	return NULL;
+  }
+  fn = smbc_getFunctionOpen (self->context);
+  file->file = (*fn)(self->context, uri, (int)flags, (mode_t)mode);
+  if(!file->file){
+	PyErr_SetFromErrno(PyExc_RuntimeError);
+	return NULL;
+  }
   Py_DECREF (largs);
   Py_DECREF (lkwlist);
   debugprintf ("%p <- Context_open() = File\n", self->context);
-  return file;
+  return (PyObject *)file;
 }
 
 static PyObject *

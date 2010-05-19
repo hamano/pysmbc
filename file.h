@@ -20,6 +20,13 @@
 #ifndef HAVE_FILE_H
 #define HAVE_FILE_H
 
+typedef struct
+{
+  PyObject_HEAD
+  Context *context;
+  SMBCFILE *file;
+} File;
+
 extern PyMethodDef File_methods[];
 extern PyTypeObject smbc_FileType;
 
