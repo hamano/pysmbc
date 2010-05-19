@@ -211,6 +211,41 @@ Context_open (Context *self, PyObject *args)
 }
 
 static PyObject *
+Context_creat(Context *self, PyObject *args)
+{
+  PyObject *largs, *lkwlist;
+  char *uri;
+  int mode = 0;
+  File *file;
+  smbc_creat_fn fn;
+
+  if(!PyArg_ParseTuple (args, "s|i", &uri, &mode)){
+      return NULL;
+  }
+
+  largs = Py_BuildValue ("()");
+  lkwlist = PyDict_New ();
+  PyDict_SetItemString (lkwlist, "context", (PyObject *) self);
+  file = (File *)smbc_FileType.tp_new(&smbc_FileType, largs, lkwlist);
+  if(!file){
+	return PyErr_NoMemory();
+  }
+  if (smbc_FileType.tp_init ((PyObject *)file, largs, lkwlist) < 0){
+	smbc_FileType.tp_dealloc((PyObject *)file);
+	return NULL;
+  }
+  fn = smbc_getFunctionCreat(self->context);
+  file->file = (*fn)(self->context, uri, mode);
+  if(!file->file){
+	PyErr_SetFromErrno(PyExc_RuntimeError);
+	return NULL;
+  }
+  Py_DECREF (largs);
+  Py_DECREF (lkwlist);
+  return (PyObject *)file;
+}
+
+static PyObject *
 Context_opendir (Context *self, PyObject *args)
 {
   PyObject *largs, *lkwlist;
@@ -493,7 +528,7 @@ PyMethodDef Context_methods[] =
       (PyCFunction) Context_opendir, METH_VARARGS,
       "opendir(uri) -> Dir\n\n"
       "@type uri: string\n"
-      "@param uri: URI to open\n"
+      "@param uri: URI to opendir\n"
       "@return: a L{smbc.Dir} object for the URI" },
 
     { "open",
@@ -501,6 +536,13 @@ PyMethodDef Context_methods[] =
       "open(uri) -> File\n\n"
       "@type uri: string\n"
       "@param uri: URI to open\n"
+      "@return: a L{smbc.File} object for the URI" },
+
+    { "creat",
+      (PyCFunction) Context_creat, METH_VARARGS,
+      "creat(uri) -> File\n\n"
+      "@type uri: string\n"
+      "@param uri: URI to creat\n"
       "@return: a L{smbc.File} object for the URI" },
 
     { "mkdir",
