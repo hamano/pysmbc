@@ -246,6 +246,22 @@ Context_creat(Context *self, PyObject *args)
 }
 
 static PyObject *
+Context_unlink(Context *self, PyObject *args)
+{
+  int ret;
+  char *uri = NULL;
+  smbc_unlink_fn fn;
+
+  if(!PyArg_ParseTuple (args, "s", &uri)) {
+	return NULL;
+  }
+
+  fn = smbc_getFunctionUnlink(self->context);
+  ret = (*fn)(self->context, uri);
+  return PyInt_FromLong(ret);
+}
+
+static PyObject *
 Context_opendir (Context *self, PyObject *args)
 {
   PyObject *largs, *lkwlist;
@@ -544,6 +560,13 @@ PyMethodDef Context_methods[] =
       "@type uri: string\n"
       "@param uri: URI to creat\n"
       "@return: a L{smbc.File} object for the URI" },
+
+    { "unlink",
+      (PyCFunction) Context_unlink, METH_VARARGS,
+      "unlink(uri) -> File\n\n"
+      "@type uri: string\n"
+      "@param uri: URI to unlink\n"
+      "@return: 0 on success, < 0 on error" },
 
     { "mkdir",
       (PyCFunction) Context_mkdir, METH_VARARGS,
