@@ -262,6 +262,28 @@ Context_unlink(Context *self, PyObject *args)
 }
 
 static PyObject *
+Context_rename(Context *self, PyObject *args)
+{
+  int ret;
+  char *ouri = NULL;
+  char *nuri = NULL;
+  Context *nctx = NULL;
+  smbc_rename_fn fn;
+
+  if (!PyArg_ParseTuple(args, "ss|O", &ouri, &nuri, &nctx)) {
+	return NULL;
+  }
+
+  fn = smbc_getFunctionRename(self->context);
+  if(nctx && nctx->context){
+	ret = (*fn)(self->context, ouri, nctx->context, nuri);
+  }else{
+	ret = (*fn)(self->context, ouri, self->context, nuri);
+  }
+  return PyInt_FromLong(ret);
+}
+
+static PyObject *
 Context_opendir (Context *self, PyObject *args)
 {
   PyObject *largs, *lkwlist;
@@ -563,9 +585,18 @@ PyMethodDef Context_methods[] =
 
     { "unlink",
       (PyCFunction) Context_unlink, METH_VARARGS,
-      "unlink(uri) -> File\n\n"
+      "unlink(uri) -> int\n\n"
       "@type uri: string\n"
       "@param uri: URI to unlink\n"
+      "@return: 0 on success, < 0 on error" },
+
+    { "rename",
+      (PyCFunction) Context_rename, METH_VARARGS,
+      "rename(ouri, nuri) -> int\n\n"
+      "@type ouri: string\n"
+      "@param ouri: The original smb uri\n"
+      "@type nuri: string\n"
+      "@param nuri: The new smb uri\n"
       "@return: 0 on success, < 0 on error" },
 
     { "mkdir",
