@@ -1,6 +1,13 @@
 NEWS
 ----
 
+New in 1.0.8:
+
+* Context.chmod()
+* Context.rename()
+* Context.unlink()
+* Context.creat()
+
 New in 1.0.7:
 
 * Context.open: omissible flags and mode
