@@ -23,8 +23,7 @@
 """This is a set of Python bindings for the libsmbclient library
 from the samba project.
 
-Directory listing example:
-
+>>> # Directory listing example:
 >>> import smbc
 >>> ctx = smbc.Context (auth_fn=my_auth_callback_fn)
 >>> entries = ctx.opendir ("smb://SERVER").getdents ()
@@ -34,21 +33,15 @@ Directory listing example:
 <smbc.Dirent object "IPC$" (IPC share) at 0x7fbd7c42b148>
 <smbc.Dirent object "Charlie" (Printer share) at 0x7fbd7c42b3c8>
 >>> d = ctx.open ("smb://SERVER/music")
-etc.
 
-Create file example:
->>> import smbc
->>> ctx = smbc.Context (auth_fn=my_auth_callback_fn)
->>> ctx.creat ("smb://SERVER/file.txt")
-
-Write file example:
+>>> # Write file example:
 >>> import smbc
 >>> import os
 >>> ctx = smbc.Context (auth_fn=my_auth_callback_fn)
 >>> file = ctx.open ("smb://SERVER/file.txt", os.O_CREAT | os.O_WRONLY)
 >>> file.write ("hello\n")
 
-Read file example:
+>>> # Read file example:
 >>> import smbc
 >>> ctx = smbc.Context (auth_fn=my_auth_callback_fn)
 >>> file = ctx.open ("smb://SERVER/file.txt")
@@ -64,8 +57,6 @@ setup (name="pysmbc",
        long_description=__doc__,
        author=["Tim Waugh <twaugh@redhat.com>",
                "Tsukasa Hamano <hamano@osstech.co.jp>"],
-       maintainer="Tim Waugh",
-       maintainer_email="twaugh@redhat.com",
        url="http://cyberelk.net/tim/software/pysmbc/",
        download_url="http://cyberelk.net/tim/data/pysmbc/",
        classifiers=[
