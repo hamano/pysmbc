@@ -21,7 +21,7 @@
 """This is a set of Python bindings for the libsmbclient library
 from the samba project.
 
-Example:
+Directory listing example:
 
 >>> import smbc
 >>> ctx = smbc.Context (auth_fn=my_auth_callback_fn)
@@ -33,6 +33,26 @@ Example:
 <smbc.Dirent object "Charlie" (Printer share) at 0x7fbd7c42b3c8>
 >>> d = ctx.open ("smb://SERVER/music")
 etc.
+
+Create file example:
+>>> import smbc
+>>> ctx = smbc.Context (auth_fn=my_auth_callback_fn)
+>>> ctx.creat ("smb://SERVER/file.txt")
+
+Write file example:
+>>> import smbc
+>>> import os
+>>> ctx = smbc.Context (auth_fn=my_auth_callback_fn)
+>>> file = ctx.open ("smb://SERVER/file.txt", os.O_CREAT | os.O_WRONLY)
+>>> file.write ("hello\n")
+
+Read file example:
+>>> import smbc
+>>> ctx = smbc.Context (auth_fn=my_auth_callback_fn)
+>>> file = ctx.open ("smb://SERVER/file.txt")
+>>> print file.read()
+hello
+
 """
 
 from distutils.core import setup, Extension
