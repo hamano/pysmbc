@@ -39,7 +39,7 @@ from the samba project.
 >>> import os
 >>> ctx = smbc.Context (auth_fn=my_auth_callback_fn)
 >>> file = ctx.open ("smb://SERVER/file.txt", os.O_CREAT | os.O_WRONLY)
->>> file.write ("hello\n")
+>>> file.write ("hello")
 
 >>> # Read file example:
 >>> import smbc
