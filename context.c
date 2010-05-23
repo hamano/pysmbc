@@ -379,6 +379,23 @@ Context_stat(Context *self, PyObject *args)
 }
 
 static PyObject *
+Context_chmod(Context *self, PyObject *args)
+{
+  int ret;
+  char *uri = NULL;
+  mode_t mode = 0;
+  smbc_chmod_fn fn;
+
+  if(!PyArg_ParseTuple (args, "si", &uri, &mode)) {
+	return NULL;
+  }
+
+  fn = smbc_getFunctionChmod(self->context);
+  ret = (*fn)(self->context, uri, mode);
+  return PyInt_FromLong(ret);
+}
+
+static PyObject *
 Context_getDebug (Context *self, void *closure)
 {
   int d = smbc_getDebug (self->context);
@@ -619,6 +636,15 @@ PyMethodDef Context_methods[] =
       "@type uri: string\n"
       "@param uri: URI to get stat information\n"
       "@return: stat information" },
+
+    { "chmod",
+      (PyCFunction) Context_chmod, METH_VARARGS,
+      "chmod(uri, mode) -> int\n\n"
+      "@type uri: string\n"
+      "@param uri: URI to chmod\n"
+      "@type mode: int\n"
+      "@param mode: permissions to set\n"
+      "@return: 0 on success, < 0 on error" },
 
     { NULL } /* Sentinel */
   };
