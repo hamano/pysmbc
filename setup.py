@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
 ## Copyright (C) 2002, 2005, 2006, 2007, 2008, 2010  Red Hat, Inc
+## Copyright (C) 2010  Open Source Solution Technology Corporation
 ## Authors:
 ##  Tim Waugh <twaugh@redhat.com>
+##  Tsukasa Hamano <hamano@osstech.co.jp>
 
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -60,8 +62,8 @@ setup (name="pysmbc",
        version="1.0.7",
        description="Python bindings for libsmbclient",
        long_description=__doc__,
-       author="Tim Waugh",
-       author_email="twaugh@redhat.com",
+       author=["Tim Waugh <twaugh@redhat.com>",
+               "Tsukasa Hamano <hamano@osstech.co.jp>"],
        maintainer="Tim Waugh",
        maintainer_email="twaugh@redhat.com",
        url="http://cyberelk.net/tim/software/pysmbc/",
