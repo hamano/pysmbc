@@ -38,13 +38,13 @@ from the samba project.
 >>> import smbc
 >>> import os
 >>> ctx = smbc.Context (auth_fn=my_auth_callback_fn)
->>> file = ctx.open ("smb://SERVER/file.txt", os.O_CREAT | os.O_WRONLY)
+>>> file = ctx.open ("smb://SERVER/music/file.txt", os.O_CREAT | os.O_WRONLY)
 >>> file.write ("hello")
 
 >>> # Read file example:
 >>> import smbc
 >>> ctx = smbc.Context (auth_fn=my_auth_callback_fn)
->>> file = ctx.open ("smb://SERVER/file.txt")
+>>> file = ctx.open ("smb://SERVER/music/file.txt")
 >>> print file.read()
 hello
 
