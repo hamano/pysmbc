@@ -205,10 +205,26 @@ File_close(File *self, PyObject *args)
 
 PyMethodDef File_methods[] =
   {
-	{"fstat", (PyCFunction)File_fstat, METH_NOARGS, NULL},
-	{"read", (PyCFunction)File_read, METH_VARARGS, NULL},
-	{"write", (PyCFunction)File_write, METH_VARARGS, NULL},
-	{"close", (PyCFunction)File_close, METH_NOARGS, NULL},
+	{"fstat", (PyCFunction)File_fstat, METH_NOARGS,
+	 "fstat() -> tuple\n\n"
+	 "@return: fstat information"
+	},
+	{"read", (PyCFunction)File_read, METH_VARARGS,
+	 "read(size) -> string\n\n"
+	 "@type size: int\n"
+	 "@param size: size of reading\n"
+	 "@return: read data"
+	},
+	{"write", (PyCFunction)File_write, METH_VARARGS,
+	 "write(buf) -> int\n\n"
+	 "@type buf: string\n"
+	 "@param buf: write data\n"
+	 "@return: size of written"
+	 },
+	{"close", (PyCFunction)File_close, METH_NOARGS,
+	 "close() -> int\n\n"
+	 "@return: on success, < 0 on error"
+	},
     { NULL } /* Sentinel */
   };
 
