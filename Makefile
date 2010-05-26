@@ -9,6 +9,7 @@ smbc.so: $(SOURCES)
 doc: smbc.so
 	rm -rf html
 	epydoc -o html --html $<
+	cd html && zip ../smbc-html.zip *
 
 clean:
 	-rm -rf build smbc.so *.pyc tests/*.pyc *~ tests/*~
