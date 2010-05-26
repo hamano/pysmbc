@@ -38,17 +38,13 @@ initsmbc (void)
   PyObject *d = PyModule_GetDict (m);
 
   // Context type
-  smbc_ContextType.tp_new = PyType_GenericNew;
   if (PyType_Ready (&smbc_ContextType) < 0)
     return;
-
   PyModule_AddObject (m, "Context", (PyObject *) &smbc_ContextType);
 
   // Dir type
-  smbc_DirType.tp_new = PyType_GenericNew;
   if (PyType_Ready (&smbc_DirType) < 0)
     return;
-
   PyModule_AddObject (m, "Dir", (PyObject *) &smbc_DirType);
 
   // File type
@@ -57,10 +53,8 @@ initsmbc (void)
   PyModule_AddObject (m, "File", (PyObject *) &smbc_FileType);
 
   // Dirent type
-  smbc_DirentType.tp_new = PyType_GenericNew;
   if (PyType_Ready (&smbc_DirentType) < 0)
     return;
-
   PyModule_AddObject (m, "Dirent", (PyObject *) &smbc_DirentType);
 
 #define INT_CONSTANT(prefix, name)			\

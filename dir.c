@@ -159,7 +159,7 @@ Dir_getdents (Dir *self)
 	  Py_DECREF (name);
 	  Py_DECREF (comment);
 	  Py_DECREF (type);
-	  dent = PyType_GenericNew (&smbc_DirentType, largs, lkwlist);
+	  dent = smbc_DirentType.tp_new (&smbc_DirentType, largs, lkwlist);
 	  smbc_DirentType.tp_init (dent, largs, lkwlist);
 	  debugprintf ("%p\n", dent);
 	  Py_DECREF (largs);
