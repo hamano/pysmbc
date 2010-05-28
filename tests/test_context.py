@@ -11,25 +11,34 @@ class TestContext(unittest.TestCase):
     def tearDown(self):
         del self.ctx
 
-    def testWorkgroup(self):
-        list = self.ctx.opendir('smb://').getdents()
-        assert(len(list) > 0)
-        for entry in list:
-            assert(entry.smbc_type == 1)
+#    def test000_Workgroup(self):
+#        list = self.ctx.opendir('smb://').getdents()
+#        assert(len(list) > 0)
+#        for entry in list:
+#            assert(entry.smbc_type == 1)
 
-    def testServer(self):
+    def test001_Server(self):
         uri = 'smb://' + settings.WORKGROUP
         list = self.ctx.opendir(uri).getdents()
         assert(len(list) > 0)
         for entry in list:
             assert(entry.smbc_type == 2)
 
-    def testShare(self):
+    def test002_Share(self):
         uri = 'smb://' + settings.SERVER
         list = self.ctx.opendir(uri).getdents()
         assert(len(list) > 0)
         for entry in list:
-            assert(entry.smbc_type == 3 or entry.smbc_type == 6)
+            assert(3 <= entry.smbc_type and entry.smbc_type <= 6)
+
+#    def test003_Dir(self):
+#        uri = 'smb://' + settings.SERVER + '/' + settings.SHARE
+#        list = self.ctx.opendir(uri).getdents()
+#        print list
+#        assert(len(list) > 0)
+#        for entry in list:
+#            print entry
+#            assert(3 <= entry.smbc_type and entry.smbc_type <= 6)
 
 if __name__ == '__main__':
     unittest.main()

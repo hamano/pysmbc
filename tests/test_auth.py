@@ -3,6 +3,7 @@
 import unittest
 import smbc
 import settings
+import sys
 
 class TestAuth(unittest.TestCase):
     def setUp(self):
@@ -11,10 +12,21 @@ class TestAuth(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def testNoAutoAnonymousLogin(self):
+    def test000_AuthSuccess(self):
         ctx = smbc.Context()
         ctx.optionNoAutoAnonymousLogin = True
-        uri = 'smb://' + settings.SERVER
+        cb = lambda se, sh, w, u, p: (w, settings.USERNAME, settings.PASSWORD)
+        ctx.functionAuthData = cb
+        uri = 'smb://' + settings.SERVER + '/' + settings.SHARE
+        try:
+            dir = ctx.opendir(uri)
+        except:
+            self.fail()
+
+    def test004_AuthFailNoauth(self):
+        ctx = smbc.Context()
+        ctx.optionNoAutoAnonymousLogin = True
+        uri = 'smb://' + settings.SERVER + '/' + settings.SHARE
         try:
             dir = ctx.opendir(uri)
         except smbc.PermissionError:
@@ -24,26 +36,27 @@ class TestAuth(unittest.TestCase):
         else:
             self.fail()
 
-    def callback(self, server, share, workgroup, username, password):
-        return (workgroup, settings.USERNAME, settings.PASSWORD)
-
-    def testAuth(self):
-        ctx = smbc.Context()
-        ctx.optionNoAutoAnonymousLogin = True
-        cb = lambda se, sh, w, u, p: (w, settings.USERNAME, settings.PASSWORD)
-        ctx.functionAuthData = cb
-        uri = 'smb://' + settings.SERVER
-        try:
-            dir = ctx.opendir(uri)
-        except:
-            self.fail()
-
-    def testAuthFail(self):
+    def test005_AuthFailNopass(self):
         ctx = smbc.Context()
         ctx.optionNoAutoAnonymousLogin = True
         cb = lambda se, sh, w, u, p: (w, settings.USERNAME, "")
         ctx.functionAuthData = cb
-        uri = 'smb://' + settings.SERVER
+        uri = 'smb://' + settings.SERVER + '/' + settings.SHARE
+        try:
+            dir = ctx.opendir(uri)
+        except smbc.PermissionError:
+            pass
+        except:
+            self.fail()
+        else:
+            self.fail()
+
+    def test006_AuthFailNoname(self):
+        ctx = smbc.Context(debug=1)
+        ctx.optionNoAutoAnonymousLogin = True
+        cb = lambda se, sh, w, u, p: (w, "", "")
+        ctx.functionAuthData = cb
+        uri = 'smb://' + settings.SERVER + '/' + settings.SHARE
         try:
             dir = ctx.opendir(uri)
         except smbc.PermissionError:
