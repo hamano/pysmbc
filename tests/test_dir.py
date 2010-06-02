@@ -4,59 +4,54 @@ import unittest
 import smbc
 import settings
 
+basedir = 'smb://' + settings.SERVER + '/' + settings.SHARE + '/'
+testdir = basedir  + '/' + settings.TESTDIR
+
 def auth_fn(server, share, workgroup, username, password):
     return (workgroup, settings.USERNAME, settings.PASSWORD)
 
-class TestDir(unittest.TestCase):
-    def setUp(self):
-        self.basedir = 'smb://' + settings.SERVER + '/' + settings.SHARE + '/'
-        self.ctx = smbc.Context()
-        self.ctx.optionNoAutoAnonymousLogin = True
-        self.ctx.functionAuthData = auth_fn
+def setUp():
+    global ctx
+    ctx = smbc.Context()
+    ctx.optionNoAutoAnonymousLogin = True
+    ctx.functionAuthData = auth_fn
 
-    def tearDown(self):
-        del self.ctx
+def tearDown():
+    global ctx
+    del ctx
 
-    def test000_Mkdir(self):
-        uri = self.basedir + 'pysmbctest'
-        ret = self.ctx.mkdir(uri, 0)
-        assert(ret == 0)
+def test_Mkdir():
+    ret = ctx.mkdir(testdir, 0)
+    assert(ret == 0)
 
-    def test001_MkdirFail(self):
-        uri = self.basedir + 'pysmbctest'
-        ret = self.ctx.mkdir(uri)
-        assert(ret < 0)
+def test_MkdirFail():
+    ret = ctx.mkdir(testdir)
+    assert(ret < 0)
 
-    def test002_ListDir(self):
-        uri = self.basedir + 'pysmbctest'
-        list = self.ctx.opendir(uri).getdents()
-        assert(len(list) == 2)
+def test_ListDir():
+    list = ctx.opendir(testdir).getdents()
+    assert(len(list) == 2)
 
-    def test003_Stat(self):
-        uri = self.basedir + 'pysmbctest'
-        st = self.ctx.stat(uri)
-        import stat
-        mode = st[stat.ST_MODE]
-        assert(stat.S_ISDIR(mode))
-        assert(stat.S_ISREG(mode) == False)
+def test_Stat():
+    st = ctx.stat(testdir)
+    import stat
+    mode = st[stat.ST_MODE]
+    assert(stat.S_ISDIR(mode))
+    assert(stat.S_ISREG(mode) == False)
 
-    def test004_Rename(self):
-        src = self.basedir + 'pysmbctest/dir1'
-        dst = self.basedir + 'pysmbctest/dir2'
-        ret = self.ctx.mkdir(src)
-        assert(ret == 0)
-        ret = self.ctx.rename(src, dst)
-        assert(ret == 0)
+def test_Rename():
+    src = testdir + '/dir1'
+    dst = testdir + '/dir2'
+    ret = ctx.mkdir(src)
+    assert(ret == 0)
+    ret = ctx.rename(src, dst)
+    assert(ret == 0)
 
-    def test005_Rmdir(self):
-        uri = self.basedir + 'pysmbctest/dir2'
-        ret = self.ctx.rmdir(uri)
-        assert(ret == 0)
+def test_Rmdir():
+    uri = testdir + '/dir2'
+    ret = ctx.rmdir(uri)
+    assert(ret == 0)
 
-    def test999_Rmdir(self):
-        uri = self.basedir + 'pysmbctest'
-        ret = self.ctx.rmdir(uri)
-        assert(ret == 0)
-
-if __name__ == '__main__':
-    unittest.main()
+def test_Cleanup():
+    ret = ctx.rmdir(testdir)
+    assert(ret == 0)
