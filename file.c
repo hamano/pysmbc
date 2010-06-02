@@ -203,6 +203,33 @@ File_close(File *self, PyObject *args)
   return PyInt_FromLong(ret);
 }
 
+static PyObject *
+File_iter(PyObject *self)
+{
+  Py_INCREF(self);
+  return self;
+}
+
+static PyObject *
+File_iternext(PyObject *self)
+{
+  File *file = (File *)self;
+  Context *ctx = file->context;
+  smbc_read_fn fn;
+  char buf[2048];
+  ssize_t len;
+  fn = smbc_getFunctionRead(ctx->context);
+  len = (*fn)(ctx->context, file->file, buf, 2048);
+  if(len > 0){
+	return PyString_FromStringAndSize(buf, len);
+  }else if(len == 0){
+	PyErr_SetNone(PyExc_StopIteration);
+  }else{
+	PyErr_SetString(PyExc_TypeError, "Expected smbc.File");
+  }
+  return NULL;
+}
+
 PyMethodDef File_methods[] =
   {
 	{"fstat", (PyCFunction)File_fstat, METH_NOARGS,
@@ -254,14 +281,14 @@ PyTypeObject smbc_FileType =
     "SMBC File\n"
     "=========\n\n"
 
-    "  A directory object."
+    "  A file object."
     "",                        /* tp_doc */
     0,                         /* tp_traverse */
     0,                         /* tp_clear */
     0,                         /* tp_richcompare */
     0,                         /* tp_weaklistoffset */
-    0,                         /* tp_iter */
-    0,                         /* tp_iternext */
+    File_iter,                 /* tp_iter */
+    File_iternext,             /* tp_iternext */
     File_methods,              /* tp_methods */
     0,                         /* tp_members */
     0,                         /* tp_getset */
