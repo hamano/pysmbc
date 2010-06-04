@@ -52,7 +52,7 @@ hello
 
 from distutils.core import setup, Extension
 setup (name="pysmbc",
-       version="1.0.8",
+       version="1.0.9-rc1",
        description="Python bindings for libsmbclient",
        long_description=__doc__,
        author=["Tim Waugh <twaugh@redhat.com>",

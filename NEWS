@@ -1,6 +1,11 @@
 NEWS
 ----
 
+New in 1.0.9:
+
+* iteration file read
+* rewrite tests for python nose
+
 New in 1.0.8:
 
 * Context.chmod()
