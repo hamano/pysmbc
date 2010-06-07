@@ -119,8 +119,18 @@ File_fstat(File *self, PyObject *args)
   int ret;
 
   fn = smbc_getFunctionFstat(ctx->context);
+  errno = 0;
   ret = (*fn)(ctx->context, self->file, &st);
   if(ret < 0){
+	if(errno == ENOMEM){
+	  PyErr_SetFromErrno(PyExc_MemoryError);
+	}else if(errno == ENOENT){
+	  PyErr_SetString(PyExc_IOError, "No such file or directory");
+	}else if(errno == EACCES){
+	  PyErr_SetString(PermissionError, "Permission denied");
+	}else{
+	  PyErr_SetFromErrno(PyExc_RuntimeError);
+	}
 	return NULL;
   }
   return Py_BuildValue("(IKKKIIKKKK)",

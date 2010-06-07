@@ -364,13 +364,22 @@ Context_stat(Context *self, PyObject *args)
   }
 
   fn = smbc_getFunctionStat(self->context);
+  errno = 0;
   ret = (*fn)(self->context, uri, &st);
   if(ret < 0){
-	PyErr_SetString(PyExc_RuntimeError, "No such file or directory");
+	if(errno == ENOMEM){
+	  PyErr_SetFromErrno(PyExc_MemoryError);
+	}else if(errno == ENOENT){
+	  PyErr_SetString(PyExc_IOError, "No such file or directory");
+	}else if(errno == EACCES){
+	  PyErr_SetString(PermissionError, "Permission denied");
+	}else{
+	  PyErr_SetFromErrno(PyExc_RuntimeError);
+	}
 	return NULL;
   }
   return Py_BuildValue("(IKKKIIKKKK)",
-					   0L,//st.st_mode,
+					   st.st_mode,
 					   (unsigned long long)st.st_ino,
 					   (unsigned long long)st.st_dev,
 					   (unsigned long long)st.st_nlink,
