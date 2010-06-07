@@ -369,7 +369,7 @@ Context_stat(Context *self, PyObject *args)
 	PyErr_SetString(PyExc_RuntimeError, "No such file or directory");
 	return NULL;
   }
-  return Py_BuildValue("(IkkkIIkkkk)",
+  return Py_BuildValue("(IKKKIIKKKK)",
 					   st.st_mode,
 					   st.st_ino,
 					   st.st_dev,

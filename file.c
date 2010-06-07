@@ -123,7 +123,7 @@ File_fstat(File *self, PyObject *args)
   if(ret < 0){
 	return NULL;
   }
-  return Py_BuildValue("(IkkkIIkkkk)",
+  return Py_BuildValue("(IKKKIIKKKK)",
 					   st.st_mode,
 					   st.st_ino,
 					   st.st_dev,
