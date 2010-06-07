@@ -19,7 +19,7 @@ def test_AuthSuccess():
     try:
         dir = ctx.opendir(uri)
     except:
-        fail()
+        assert False
 
 def test_AuthFailNoauth():
     ctx = smbc.Context()
@@ -30,9 +30,9 @@ def test_AuthFailNoauth():
     except smbc.PermissionError:
         pass
     except:
-        fail()
+        assert False
     else:
-        fail()
+        assert False
 
 def test_AuthFailNopass():
     ctx = smbc.Context()
@@ -45,9 +45,9 @@ def test_AuthFailNopass():
     except smbc.PermissionError:
         pass
     except:
-        fail()
+        assert False
     else:
-        fail()
+        assert False
 
 def test_AuthFailNoname():
     ctx = smbc.Context()
@@ -60,6 +60,11 @@ def test_AuthFailNoname():
     except smbc.PermissionError:
         pass
     except:
-        fail()
+        assert False
     else:
-        fail()
+        assert False
+
+if __name__ == '__main__':
+    import nose
+    result = nose.run()
+

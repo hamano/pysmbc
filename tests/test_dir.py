@@ -3,6 +3,7 @@
 import unittest
 import smbc
 import settings
+import stat
 
 basedir = 'smb://' + settings.SERVER + '/' + settings.SHARE + '/'
 testdir = basedir  + '/' + settings.TESTDIR
@@ -34,7 +35,6 @@ def test_ListDir():
 
 def test_Stat():
     st = ctx.stat(testdir)
-    import stat
     mode = st[stat.ST_MODE]
     assert(stat.S_ISDIR(mode))
     assert(stat.S_ISREG(mode) == False)
@@ -46,6 +46,15 @@ def test_Rename():
     assert(ret == 0)
     ret = ctx.rename(src, dst)
     assert(ret == 0)
+
+def test_StatFail():
+    uri = testdir + '/dir1'
+    try:
+        ctx.stat(uri)
+    except IOError:
+        pass
+    except:
+        assert False
 
 def test_Rmdir():
     uri = testdir + '/dir2'
