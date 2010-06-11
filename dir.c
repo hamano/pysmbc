@@ -79,9 +79,11 @@ Dir_init (Dir *self, PyObject *args, PyObject *kwds)
   dir = (*fn) (ctx->context, uri);
   if (dir == NULL) {
 	if(errno == EACCES){
-	  PyErr_SetString(PermissionError, "Permission denied.");
+	  PyErr_SetString(PermissionError, "Permission denied");
+	}else if(errno == ENOENT){
+	  PyErr_SetString(NoEntryError, "No such file or directory");
 	}else if(errno == EPERM){
-	  PyErr_SetString(PermissionError, "Workgroup could not be found.");
+	  PyErr_SetString(PermissionError, "Operation not permitted");
 	}else if(errno == ENOMEM){
 	  PyErr_SetFromErrno(PyExc_MemoryError);
 	}else{

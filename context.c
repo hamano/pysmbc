@@ -370,7 +370,7 @@ Context_stat(Context *self, PyObject *args)
 	if(errno == ENOMEM){
 	  PyErr_SetFromErrno(PyExc_MemoryError);
 	}else if(errno == ENOENT){
-	  PyErr_SetString(PyExc_IOError, "No such file or directory");
+	  PyErr_SetString(NoEntryError, "No such file or directory");
 	}else if(errno == EACCES){
 	  PyErr_SetString(PermissionError, "Permission denied");
 	}else{
