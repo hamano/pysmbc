@@ -30,6 +30,23 @@
 // File //
 //////////
 
+/*
+  The size of off_t is potentionally unknown, so try to use the
+  biggest integer type possible when coverting between ptyhon
+  values and off_t.
+
+  In order to communicate offset values between python objects and C
+  types use off_t_long as the C type and OFF_T_FORMAT as the format
+  character for Py_BuildValue, PyArg_Parse, and similar functions.
+*/
+#ifdef HAVE_LONG_LONG
+typedef PY_LONG_LONG off_t_long;
+#define OFF_T_FORMAT "L"
+#else
+typedef PY_LONG off_t_long;
+#define OFF_T_FORMAT "l"
+#endif
+
 static PyObject *
 File_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
@@ -240,6 +257,29 @@ File_iternext(PyObject *self)
   return NULL;
 }
 
+static PyObject *
+File_lseek(File *self, PyObject *args)
+{
+  Context *ctx = self->context;
+  smbc_lseek_fn fn;
+  off_t_long py_offset;
+  off_t offset;
+  int whence=0;
+  off_t ret;
+
+  if(!PyArg_ParseTuple(args, (OFF_T_FORMAT "|i"), &py_offset, &whence)){
+	return NULL;
+  }
+  offset = py_offset;
+  /* check for data loss from cast */
+  if ((off_t_long)offset != py_offset) {
+	PyErr_SetString(PyExc_OverflowError, "Data loss in casting off_t");
+  }
+  fn = smbc_getFunctionLseek(ctx->context);
+  ret = (*fn)(ctx->context, self->file, offset, whence);
+  return Py_BuildValue(OFF_T_FORMAT, ret);
+}
+
 PyMethodDef File_methods[] =
   {
 	{"fstat", (PyCFunction)File_fstat, METH_NOARGS,
@@ -261,6 +301,10 @@ PyMethodDef File_methods[] =
 	{"close", (PyCFunction)File_close, METH_NOARGS,
 	 "close() -> int\n\n"
 	 "@return: on success, < 0 on error"
+	},
+	{"lseek", (PyCFunction)File_lseek, METH_VARARGS,
+	 "lseek(offset, whence=0)\n\n"
+	 "@return: on success, current offset location, othwerwise -1"
 	},
     { NULL } /* Sentinel */
   };
