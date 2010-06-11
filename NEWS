@@ -6,6 +6,7 @@ New in 1.0.9:
 * iteration file read
 * rewrite tests for python nose
 * fixed stat portability issue
+* smbc.NoEntryError
 
 New in 1.0.8:
 
