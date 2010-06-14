@@ -2,7 +2,7 @@ NAME=pysmbc
 VERSION:=$(shell python setup.py --version)
 SDIST_ARGS=--formats=bztar -d.
 
-smbc.so: $(SOURCES)
+smbc.so: force
 	python setup.py build
 	mv build/lib*/$@ .
 
@@ -25,5 +25,5 @@ install:
 	if [ -n "$$DESTDIR" ]; then ROOT="--root $$DESTDIR"; fi; \
 	python setup.py install $$ROOT
 
-.PHONY: doc clean dist install
+.PHONY: doc clean dist install force
 
