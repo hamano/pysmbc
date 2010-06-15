@@ -362,6 +362,20 @@ Context_rmdir(Context *self, PyObject *args)
 
   fn = smbc_getFunctionRmdir(self->context);
   ret = (*fn)(self->context, uri);
+  if(ret < 0){
+	if(errno == EEXIST){
+	  PyErr_SetFromErrno(ExistsError);
+	}else if(errno == EACCES){
+	  PyErr_SetFromErrno(PermissionError);
+	}else if(errno == ENOENT){
+	  PyErr_SetFromErrno(NoEntryError);
+	}else if(errno == ENOMEM){
+	  PyErr_SetFromErrno(PyExc_MemoryError);
+	}else{
+	  PyErr_SetFromErrno(PyExc_RuntimeError);
+	}
+	return NULL;
+  }
   return PyInt_FromLong(ret);
 }
 
