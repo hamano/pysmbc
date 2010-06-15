@@ -1,4 +1,5 @@
 build
 smbc.so
 tests/*.pyc
+tests/settings.py
 MANIFEST
