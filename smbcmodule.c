@@ -31,7 +31,7 @@ static PyMethodDef SmbcMethods[] = {
 
 PyObject *NoEntryError;
 PyObject *PermissionError;
-
+PyObject *ExistsError;
 
 void
 initsmbc (void)
@@ -85,6 +85,9 @@ initsmbc (void)
   Py_INCREF(PermissionError);
   PyModule_AddObject(m, "PermissionError", PermissionError);
 
+  ExistsError = PyErr_NewException("smbc.ExistsError", NULL, NULL);
+  Py_INCREF(ExistsError);
+  PyModule_AddObject(m, "ExistsError", ExistsError);
 }
 
 ///////////////
