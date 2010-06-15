@@ -35,5 +35,6 @@ extern void debugprintf (const char *fmt, ...) FORMAT ((__printf__, 1, 2));
 extern PyObject *NoEntryError;
 extern PyObject *PermissionError;
 extern PyObject *ExistsError;
+extern PyObject *NotEmptyError;
 
 #endif /* HAVE_SMBCMODULE_H */
