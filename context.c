@@ -332,6 +332,20 @@ Context_mkdir(Context *self, PyObject *args)
 
   fn = smbc_getFunctionMkdir(self->context);
   ret = (*fn)(self->context, uri, mode);
+  if(ret < 0){
+	if(errno == EEXIST){
+	  PyErr_SetFromErrno(ExistsError);
+	}else if(errno == EACCES){
+	  PyErr_SetFromErrno(PermissionError);
+	}else if(errno == ENOENT){
+	  PyErr_SetFromErrno(NoEntryError);
+	}else if(errno == ENOMEM){
+	  PyErr_SetFromErrno(PyExc_MemoryError);
+	}else{
+	  PyErr_SetFromErrno(PyExc_RuntimeError);
+	}
+	return NULL;
+  }
   return PyInt_FromLong(ret);
 }
 
