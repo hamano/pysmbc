@@ -133,7 +133,7 @@ File_fstat(File *self, PyObject *args)
 	}
 	return NULL;
   }
-  return Py_BuildValue("(IKKKIIKKKK)",
+  return Py_BuildValue("(IKKKIIKIII)",
 					   st.st_mode,
 					   (unsigned long long)st.st_ino,
 					   (unsigned long long)st.st_dev,
