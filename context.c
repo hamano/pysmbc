@@ -363,7 +363,6 @@ Context_rmdir(Context *self, PyObject *args)
   fn = smbc_getFunctionRmdir(self->context);
   ret = (*fn)(self->context, uri);
   if(ret < 0){
-	printf("errno: %d\n", errno);
 	if(errno == EEXIST){
 	  PyErr_SetFromErrno(ExistsError);
 	}else if(errno == ENOTEMPTY){

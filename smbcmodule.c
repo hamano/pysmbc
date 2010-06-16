@@ -92,7 +92,7 @@ initsmbc (void)
 
   NotEmptyError = PyErr_NewException("smbc.NotEmptyError", NULL, NULL);
   Py_INCREF(NotEmptyError);
-  PyModule_AddObject(m, "NotEmpyError", NotEmptyError);
+  PyModule_AddObject(m, "NotEmptyError", NotEmptyError);
 }
 
 ///////////////
