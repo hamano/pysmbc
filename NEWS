@@ -10,7 +10,7 @@ New in 1.0.9:
 * smbc.ExistsError
 * smbc.NotEmptyError
 * smbc.TimedOutError
-* File.seek()
+* File.seek() and File.lseek()
 
 New in 1.0.8:
 
