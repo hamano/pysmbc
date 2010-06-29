@@ -78,25 +78,7 @@ Dir_init (Dir *self, PyObject *args, PyObject *kwds)
   errno = 0;
   dir = (*fn) (ctx->context, uri);
   if (dir == NULL) {
-	switch(errno){
-	case EACCES:
-	  PyErr_SetFromErrno(PermissionError);
-	  break;
-	case ENOENT:
-	  PyErr_SetFromErrno(NoEntryError);
-	  break;
-	case EPERM:
-	  PyErr_SetFromErrno(PermissionError);
-	  break;
-	case ENOMEM:
-	  PyErr_SetFromErrno(PyExc_MemoryError);
-	  break;
-	case ETIMEDOUT:
-	  PyErr_SetFromErrno(TimedOutError);
-	  break;
-	default:
-	  PyErr_SetFromErrno(PyExc_RuntimeError);
-	}
+	pysmbc_SetFromErrno();
 	return -1;
   }
   self->dir = dir;
@@ -147,7 +129,7 @@ Dir_getdents (Dir *self)
       debugprintf ("dirlen = %d\n", dirlen);
       if (dirlen < 0)
 	{
-	  PyErr_SetFromErrno (PyExc_RuntimeError);
+	  pysmbc_SetFromErrno();
 	  Py_DECREF (listobj);
 	  debugprintf ("<- Dir_getdents() EXCEPTION\n");
 	  return NULL;

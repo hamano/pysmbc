@@ -31,6 +31,7 @@
 #endif
 
 extern void debugprintf (const char *fmt, ...) FORMAT ((__printf__, 1, 2));
+extern void pysmbc_SetFromErrno(void);
 
 extern PyObject *NoEntryError;
 extern PyObject *PermissionError;

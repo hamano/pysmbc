@@ -260,7 +260,12 @@ Context_unlink(Context *self, PyObject *args)
   }
 
   fn = smbc_getFunctionUnlink(self->context);
+  errno = 0;
   ret = (*fn)(self->context, uri);
+  if(ret < 0){
+	pysmbc_SetFromErrno();
+	return NULL;
+  }
   return PyInt_FromLong(ret);
 }
 
@@ -278,10 +283,15 @@ Context_rename(Context *self, PyObject *args)
   }
 
   fn = smbc_getFunctionRename(self->context);
+  errno = 0;
   if(nctx && nctx->context){
 	ret = (*fn)(self->context, ouri, nctx->context, nuri);
   }else{
 	ret = (*fn)(self->context, ouri, self->context, nuri);
+  }
+  if(ret < 0){
+	pysmbc_SetFromErrno();
+	return NULL;
   }
   return PyInt_FromLong(ret);
 }
@@ -331,19 +341,10 @@ Context_mkdir(Context *self, PyObject *args)
   }
 
   fn = smbc_getFunctionMkdir(self->context);
+  errno = 0;
   ret = (*fn)(self->context, uri, mode);
   if(ret < 0){
-	if(errno == EEXIST){
-	  PyErr_SetFromErrno(ExistsError);
-	}else if(errno == EACCES){
-	  PyErr_SetFromErrno(PermissionError);
-	}else if(errno == ENOENT){
-	  PyErr_SetFromErrno(NoEntryError);
-	}else if(errno == ENOMEM){
-	  PyErr_SetFromErrno(PyExc_MemoryError);
-	}else{
-	  PyErr_SetFromErrno(PyExc_RuntimeError);
-	}
+	pysmbc_SetFromErrno();
 	return NULL;
   }
   return PyInt_FromLong(ret);
@@ -361,21 +362,10 @@ Context_rmdir(Context *self, PyObject *args)
   }
 
   fn = smbc_getFunctionRmdir(self->context);
+  errno = 0;
   ret = (*fn)(self->context, uri);
   if(ret < 0){
-	if(errno == EEXIST){
-	  PyErr_SetFromErrno(ExistsError);
-	}else if(errno == ENOTEMPTY){
-	  PyErr_SetFromErrno(NotEmptyError);
-	}else if(errno == EACCES){
-	  PyErr_SetFromErrno(PermissionError);
-	}else if(errno == ENOENT){
-	  PyErr_SetFromErrno(NoEntryError);
-	}else if(errno == ENOMEM){
-	  PyErr_SetFromErrno(PyExc_MemoryError);
-	}else{
-	  PyErr_SetFromErrno(PyExc_RuntimeError);
-	}
+	pysmbc_SetFromErrno();
 	return NULL;
   }
   return PyInt_FromLong(ret);
@@ -397,15 +387,7 @@ Context_stat(Context *self, PyObject *args)
   errno = 0;
   ret = (*fn)(self->context, uri, &st);
   if(ret < 0){
-	if(errno == ENOMEM){
-	  PyErr_SetFromErrno(PyExc_MemoryError);
-	}else if(errno == ENOENT){
-	  PyErr_SetString(NoEntryError, "No such file or directory");
-	}else if(errno == EACCES){
-	  PyErr_SetString(PermissionError, "Permission denied");
-	}else{
-	  PyErr_SetFromErrno(PyExc_RuntimeError);
-	}
+	pysmbc_SetFromErrno();
 	return NULL;
   }
   return Py_BuildValue("(IKKKIIKIII)",
@@ -432,9 +414,13 @@ Context_chmod(Context *self, PyObject *args)
   if(!PyArg_ParseTuple (args, "si", &uri, &mode)) {
 	return NULL;
   }
-
+  errno = 0;
   fn = smbc_getFunctionChmod(self->context);
   ret = (*fn)(self->context, uri, mode);
+  if(ret < 0){
+	pysmbc_SetFromErrno();
+	return NULL;
+  }
   return PyInt_FromLong(ret);
 }
 
