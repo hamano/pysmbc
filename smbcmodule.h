@@ -36,5 +36,6 @@ extern PyObject *NoEntryError;
 extern PyObject *PermissionError;
 extern PyObject *ExistsError;
 extern PyObject *NotEmptyError;
+extern PyObject *TimedOutError;
 
 #endif /* HAVE_SMBCMODULE_H */

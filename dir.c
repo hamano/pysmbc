@@ -78,20 +78,27 @@ Dir_init (Dir *self, PyObject *args, PyObject *kwds)
   errno = 0;
   dir = (*fn) (ctx->context, uri);
   if (dir == NULL) {
-	if(errno == EACCES){
-	  PyErr_SetString(PermissionError, "Permission denied");
-	}else if(errno == ENOENT){
-	  PyErr_SetString(NoEntryError, "No such file or directory");
-	}else if(errno == EPERM){
-	  PyErr_SetString(PermissionError, "Operation not permitted");
-	}else if(errno == ENOMEM){
+	switch(errno){
+	case EACCES:
+	  PyErr_SetFromErrno(PermissionError);
+	  break;
+	case ENOENT:
+	  PyErr_SetFromErrno(NoEntryError);
+	  break;
+	case EPERM:
+	  PyErr_SetFromErrno(PermissionError);
+	  break;
+	case ENOMEM:
 	  PyErr_SetFromErrno(PyExc_MemoryError);
-	}else{
+	  break;
+	case ETIMEDOUT:
+	  PyErr_SetFromErrno(TimedOutError);
+	  break;
+	default:
 	  PyErr_SetFromErrno(PyExc_RuntimeError);
 	}
 	return -1;
   }
-
   self->dir = dir;
   debugprintf ("%p <- Dir_init() = 0\n", self->dir);
   return 0;
