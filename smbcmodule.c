@@ -33,6 +33,7 @@ PyObject *NoEntryError;
 PyObject *PermissionError;
 PyObject *ExistsError;
 PyObject *NotEmptyError;
+PyObject *TimedOutError;
 
 void
 initsmbc (void)
@@ -93,6 +94,10 @@ initsmbc (void)
   NotEmptyError = PyErr_NewException("smbc.NotEmptyError", NULL, NULL);
   Py_INCREF(NotEmptyError);
   PyModule_AddObject(m, "NotEmptyError", NotEmptyError);
+
+  TimedOutError = PyErr_NewException("smbc.TimedOutError", NULL, NULL);
+  Py_INCREF(TimedOutError);
+  PyModule_AddObject(m, "TimedOutError", TimedOutError);
 }
 
 ///////////////
