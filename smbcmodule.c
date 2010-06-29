@@ -100,6 +100,33 @@ initsmbc (void)
   PyModule_AddObject(m, "TimedOutError", TimedOutError);
 }
 
+void pysmbc_SetFromErrno()
+{
+  switch(errno){
+  case EEXIST:
+	PyErr_SetFromErrno(ExistsError);
+	break;
+  case ENOTEMPTY:
+	PyErr_SetFromErrno(NotEmptyError);
+	break;
+  case EACCES:
+	PyErr_SetFromErrno(PermissionError);
+	break;
+  case ENOENT:
+	PyErr_SetFromErrno(NoEntryError);
+	break;
+  case ETIMEDOUT:
+	PyErr_SetFromErrno(TimedOutError);
+	break;
+  case ENOMEM:
+	PyErr_SetFromErrno(PyExc_MemoryError);
+	break;
+  default:
+	PyErr_SetFromErrno(PyExc_RuntimeError);
+  }
+  return;
+}
+
 ///////////////
 // Debugging //
 ///////////////
@@ -123,7 +150,7 @@ debugprintf (const char *fmt, ...)
 
       debugging_enabled = 1;
     }
-  
+
   {
     va_list ap;
     va_start (ap, fmt);
