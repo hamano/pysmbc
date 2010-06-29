@@ -180,22 +180,6 @@ File_write(File *self, PyObject *args)
 }
 
 static PyObject *
-File_seek(File *self, PyObject *args)
-{
-  Context *ctx = self->context;
-  off_t offset;
-  int whence;
-  smbc_lseek_fn fn;
-  off_t ret;
-  if(!PyArg_ParseTuple(args, "Ki", &offset, &whence)){
-	return NULL;
-  }
-  fn = smbc_getFunctionLseek(ctx->context);
-  ret = (*fn)(ctx->context, self->file, offset, whence);
-  return PyInt_FromLong(ret);
-}
-
-static PyObject *
 File_fstat(File *self, PyObject *args)
 {
   Context *ctx = self->context;
@@ -310,20 +294,6 @@ PyMethodDef File_methods[] =
 	 "@param buf: write data\n"
 	 "@return: size of written"
 	 },
-	{"seek", (PyCFunction)File_seek, METH_VARARGS,
-	 "seek(offset, whence) -> int\n\n"
-	 "@type offset: long long\n"
-	 "@param offset: offset in bytes from whence\n"
-	 "@type whence: int\n"
-	 "@param whence: A location in the file:\n"
-	 "- SEEK_SET The offset is set to offset bytes from "
-	 "the beginning of the file.\n"
-	 "- SEEK_CUR The offset is set to current location "
-	 "plus offset bytes.\n"
-	 "- SEEK_END The offset is set to the size of the "
-	 "file plus offset bytes.\n"
-	 "@return: resulting offset location\n"
-	},
 	{"fstat", (PyCFunction)File_fstat, METH_NOARGS,
 	 "fstat() -> tuple\n\n"
 	 "@return: fstat information"
@@ -334,6 +304,10 @@ PyMethodDef File_methods[] =
 	},
 	{"lseek", (PyCFunction)File_lseek, METH_VARARGS,
 	 "lseek(offset, whence=0)\n\n"
+	 "@return: on success, current offset location, othwerwise -1"
+	},
+	{"seek", (PyCFunction)File_lseek, METH_VARARGS,
+	 "seek(offset, whence=0)\n\n"
 	 "@return: on success, current offset location, othwerwise -1"
 	},
     { NULL } /* Sentinel */
