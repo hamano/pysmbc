@@ -155,9 +155,13 @@ File_read(File *self, PyObject *args)
 	return PyErr_NoMemory();
   }
   len = (*fn)(ctx->context, self->file, buf, size);
+  if(len < 0){
+	pysmbc_SetFromErrno();
+	free(buf)
+	return NULL;
+  }
   ret = PyString_FromStringAndSize(buf, len);
   free(buf);
-
   return ret;
 }
 
@@ -175,7 +179,10 @@ File_write(File *self, PyObject *args)
   }
   fn = smbc_getFunctionWrite(ctx->context);
   len = (*fn)(ctx->context, self->file, buf, size);
-
+  if(len < 0){
+	pysmbc_SetFromErrno();
+	return NULL;
+  }
   return PyInt_FromLong(len);
 }
 
@@ -244,7 +251,7 @@ File_iternext(PyObject *self)
   }else if(len == 0){
 	PyErr_SetNone(PyExc_StopIteration);
   }else{
-	PyErr_SetString(PyExc_TypeError, "Expected smbc.File");
+	pysmbc_SetFromErrno();
   }
   return NULL;
 }
@@ -269,6 +276,10 @@ File_lseek(File *self, PyObject *args)
   }
   fn = smbc_getFunctionLseek(ctx->context);
   ret = (*fn)(ctx->context, self->file, offset, whence);
+  if(ret < 0){
+	pysmbc_SetFromErrno();
+	return NULL;
+  }
   return Py_BuildValue(OFF_T_FORMAT, ret);
 }
 
