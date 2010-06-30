@@ -204,7 +204,7 @@ Context_open (Context *self, PyObject *args)
   fn = smbc_getFunctionOpen (self->context);
   file->file = (*fn)(self->context, uri, (int)flags, (mode_t)mode);
   if(!file->file){
-	PyErr_SetFromErrno(PyExc_RuntimeError);
+	// already set error
 	return NULL;
   }
   Py_DECREF (largs);
@@ -238,9 +238,10 @@ Context_creat(Context *self, PyObject *args)
 	return NULL;
   }
   fn = smbc_getFunctionCreat(self->context);
+  errno = 0;
   file->file = (*fn)(self->context, uri, mode);
   if(!file->file){
-	PyErr_SetFromErrno(PyExc_RuntimeError);
+	pysmbc_SetFromErrno();
 	return NULL;
   }
   Py_DECREF (largs);

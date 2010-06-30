@@ -97,7 +97,7 @@ File_init (File *self, PyObject *args, PyObject *kwds)
 	file = (*fn) (ctx->context, uri, (int) flags, (mode_t) mode);
 	if (file == NULL)
 	  {
-		PyErr_SetFromErrno (PyExc_RuntimeError);
+		pysmbc_SetFromErrno();
 		return -1;
 	  }
 	self->file = file;
@@ -191,15 +191,7 @@ File_fstat(File *self, PyObject *args)
   errno = 0;
   ret = (*fn)(ctx->context, self->file, &st);
   if(ret < 0){
-	if(errno == ENOMEM){
-	  PyErr_SetFromErrno(PyExc_MemoryError);
-	}else if(errno == ENOENT){
-	  PyErr_SetString(NoEntryError, "No such file or directory");
-	}else if(errno == EACCES){
-	  PyErr_SetString(PermissionError, "Permission denied");
-	}else{
-	  PyErr_SetFromErrno(PyExc_RuntimeError);
-	}
+	pysmbc_SetFromErrno();
 	return NULL;
   }
   return Py_BuildValue("(IKKKIIKIII)",
