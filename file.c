@@ -157,7 +157,7 @@ File_read(File *self, PyObject *args)
   len = (*fn)(ctx->context, self->file, buf, size);
   if(len < 0){
 	pysmbc_SetFromErrno();
-	free(buf)
+	free(buf);
 	return NULL;
   }
   ret = PyString_FromStringAndSize(buf, len);
