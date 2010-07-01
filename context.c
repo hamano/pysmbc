@@ -199,12 +199,14 @@ Context_open (Context *self, PyObject *args)
   if (smbc_FileType.tp_init ((PyObject *)file, largs, lkwlist) < 0){
 	smbc_FileType.tp_dealloc((PyObject *)file);
 	debugprintf ("%p <- Context_open() EXCEPTION\n", self->context);
+	// already set error
 	return NULL;
   }
   fn = smbc_getFunctionOpen (self->context);
+  errno = 0;
   file->file = (*fn)(self->context, uri, (int)flags, (mode_t)mode);
   if(!file->file){
-	// already set error
+	pysmbc_SetFromErrno();
 	return NULL;
   }
   Py_DECREF (largs);
