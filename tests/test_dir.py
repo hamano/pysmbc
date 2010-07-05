@@ -26,8 +26,16 @@ def test_Mkdir():
     assert(ret == 0)
 
 def test_MkdirFail():
-    ret = ctx.mkdir(testdir)
-    assert(ret < 0)
+    print testdir
+    try:
+        ret = ctx.mkdir(testdir)
+    except smbc.ExistsError:
+        pass
+    except:
+        assert False
+    else:
+        assert False
+    assert True
 
 def test_ListDir():
     list = ctx.opendir(testdir).getdents()
@@ -51,7 +59,7 @@ def test_StatFail():
     uri = testdir + '/dir1'
     try:
         ctx.stat(uri)
-    except IOError:
+    except smbc.NoEntryError:
         pass
     except:
         assert False
