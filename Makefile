@@ -9,6 +9,8 @@ smbc.so: force
 doc: smbc.so
 	rm -rf html
 	epydoc -o html --html $<
+
+doczip:	doc
 	cd html && zip ../smbc-html.zip *
 
 clean:
@@ -25,5 +27,5 @@ install:
 	if [ -n "$$DESTDIR" ]; then ROOT="--root $$DESTDIR"; fi; \
 	python setup.py install $$ROOT
 
-.PHONY: doc clean dist install force
+.PHONY: doc doczip clean dist install force
 
