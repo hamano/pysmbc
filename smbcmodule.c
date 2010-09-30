@@ -38,6 +38,7 @@ PyObject *PermissionError;
 PyObject *ExistsError;
 PyObject *NotEmptyError;
 PyObject *TimedOutError;
+PyObject *NoSpaceError;
 
 void
 initsmbc (void)
@@ -102,6 +103,10 @@ initsmbc (void)
   TimedOutError = PyErr_NewException("smbc.TimedOutError", NULL, NULL);
   Py_INCREF(TimedOutError);
   PyModule_AddObject(m, "TimedOutError", TimedOutError);
+
+  NoSpaceError = PyErr_NewException("smbc.NoSpaceError", NULL, NULL);
+  Py_INCREF(NoSpaceError);
+  PyModule_AddObject(m, "NoSpaceError", NoSpaceError);
 }
 
 void pysmbc_SetFromErrno()
@@ -127,6 +132,9 @@ void pysmbc_SetFromErrno()
 	break;
   case ENOMEM:
 	PyErr_SetFromErrno(PyExc_MemoryError);
+	break;
+  case ENOSPC:
+	PyErr_SetFromErrno(NoSpaceError);
 	break;
   default:
 	PyErr_SetFromErrno(PyExc_RuntimeError);
