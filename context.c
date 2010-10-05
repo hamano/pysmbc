@@ -707,7 +707,15 @@ PyTypeObject smbc_ContextType =
     "SMBC context\n"
     "============\n\n"
 
-    "  A context for libsmbclient calls."
+    "  A context for libsmbclient calls.\n\n"
+    "Optional parameters are:\n\n"
+    "auth_fn: a function for collecting authentication details from\n"
+    "the user. This is called whenever authentication details are needed.\n"
+    "The parameters it will be given are all strings: server, share,\n"
+    "workgroup, username, and password (these last two can be ignored).\n"
+    "The function should return a tuple of strings: workgroup, username,\n"
+    "and password.\n\n"
+    "debug: an integer representing the debug level to use.\n"
     "",                        /* tp_doc */
     0,                         /* tp_traverse */
     0,                         /* tp_clear */
