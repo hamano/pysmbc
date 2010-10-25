@@ -2,9 +2,11 @@
  * pysmbc - Python bindings for libsmbclient
  * Copyright (C) 2002, 2005, 2006, 2007, 2008, 2010  Red Hat, Inc
  * Copyright (C) 2010  Open Source Solution Technology Corporation
+ * Copyright (C) 2010  Patrick Geltinger <patlkli@patlkli.org>
  * Authors:
  *  Tim Waugh <twaugh@redhat.com>
  *  Tsukasa Hamano <hamano@osstech.co.jp>
+ *  Patrick Geltinger <patlkli@patlkli.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,10 +42,27 @@ PyObject *NotEmptyError;
 PyObject *TimedOutError;
 PyObject *NoSpaceError;
 
+#if PY_MAJOR_VERSION >= 3
+  static struct PyModuleDef smbc_module = {
+    PyModuleDef_HEAD_INIT,
+    "smbc",
+    NULL,
+    -1,
+    SmbcMethods
+  };
+
+PyObject *
+PyInit_smbc (void)
+#else
 void
 initsmbc (void)
+#endif
 {
-  PyObject *m = Py_InitModule ("smbc", SmbcMethods);
+#if PY_MAJOR_VERSION >= 3
+    PyObject *m = PyModule_Create (&smbc_module);
+#else
+    PyObject *m = Py_InitModule ("smbc", SmbcMethods);
+#endif
   PyObject *d = PyModule_GetDict (m);
 
   // Context type
@@ -69,7 +88,7 @@ initsmbc (void)
 #define INT_CONSTANT(prefix, name)			\
   do							\
   {							\
-    PyObject *val = PyInt_FromLong (prefix##name);	\
+    PyObject *val = PyLong_FromLong (prefix##name);	\
     PyDict_SetItemString (d, #name, val);		\
     Py_DECREF (val);					\
   } while (0);
@@ -107,6 +126,10 @@ initsmbc (void)
   NoSpaceError = PyErr_NewException("smbc.NoSpaceError", NULL, NULL);
   Py_INCREF(NoSpaceError);
   PyModule_AddObject(m, "NoSpaceError", NoSpaceError);
+
+#if PY_MAJOR_VERSION >= 3
+  return m;
+#endif
 }
 
 void pysmbc_SetFromErrno()

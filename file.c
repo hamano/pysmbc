@@ -2,9 +2,11 @@
  * pysmbc - Python bindings for libsmbclient
  * Copyright (C) 2002, 2005, 2006, 2007, 2008, 2010  Red Hat, Inc
  * Copyright (C) 2010  Open Source Solution Technology Corporation
+ * Copyright (C) 2010  Patrick Geltinger <patlkli@patlkli.org>
  * Authors:
  *  Tim Waugh <twaugh@redhat.com>
  *  Tsukasa Hamano <hamano@osstech.co.jp>
+ *  Patrick Geltinger <patlkli@patlkli.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -124,7 +126,7 @@ File_dealloc (File *self)
       Py_DECREF ((PyObject *) self->context);
     }
 
-  self->ob_type->tp_free ((PyObject *) self);
+  Py_TYPE(self)->tp_free ((PyObject *) self);
 }
 
 static PyObject *
@@ -160,7 +162,7 @@ File_read(File *self, PyObject *args)
 	free(buf);
 	return NULL;
   }
-  ret = PyString_FromStringAndSize(buf, len);
+  ret = PyUnicode_FromStringAndSize(buf, len);
   free(buf);
   return ret;
 }
@@ -183,7 +185,7 @@ File_write(File *self, PyObject *args)
 	pysmbc_SetFromErrno();
 	return NULL;
   }
-  return PyInt_FromLong(len);
+  return PyLong_FromLong(len);
 }
 
 static PyObject *
@@ -226,7 +228,7 @@ File_close(File *self, PyObject *args)
 	ret = (*fn)(ctx->context, self->file);
 	self->file = NULL;
   }
-  return PyInt_FromLong(ret);
+  return PyLong_FromLong(ret);
 }
 
 static PyObject *
@@ -247,7 +249,7 @@ File_iternext(PyObject *self)
   fn = smbc_getFunctionRead(ctx->context);
   len = (*fn)(ctx->context, file->file, buf, 2048);
   if(len > 0){
-	return PyString_FromStringAndSize(buf, len);
+	return PyUnicode_FromStringAndSize(buf, len);
   }else if(len == 0){
 	PyErr_SetNone(PyExc_StopIteration);
   }else{
@@ -316,49 +318,97 @@ PyMethodDef File_methods[] =
     { NULL } /* Sentinel */
   };
 
-PyTypeObject smbc_FileType =
-  {
-    PyObject_HEAD_INIT(NULL)
-    0,                         /*ob_size*/
-    "smbc.File",               /*tp_name*/
-    sizeof(File),              /*tp_basicsize*/
-    0,                         /*tp_itemsize*/
-    (destructor)File_dealloc,  /*tp_dealloc*/
-    0,                         /*tp_print*/
-    0,                         /*tp_getattr*/
-    0,                         /*tp_setattr*/
-    0,                         /*tp_compare*/
-    0,                         /*tp_repr*/
-    0,                         /*tp_as_number*/
-    0,                         /*tp_as_sequence*/
-    0,                         /*tp_as_mapping*/
-    0,                         /*tp_hash */
-    0,                         /*tp_call*/
-    0,                         /*tp_str*/
-    0,                         /*tp_getattro*/
-    0,                         /*tp_setattro*/
-    0,                         /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,        /*tp_flags*/
-    "SMBC File\n"
-    "=========\n\n"
-
-    "  A file object."
-    "",                        /* tp_doc */
-    0,                         /* tp_traverse */
-    0,                         /* tp_clear */
-    0,                         /* tp_richcompare */
-    0,                         /* tp_weaklistoffset */
-    File_iter,                 /* tp_iter */
-    File_iternext,             /* tp_iternext */
-    File_methods,              /* tp_methods */
-    0,                         /* tp_members */
-    0,                         /* tp_getset */
-    0,                         /* tp_base */
-    0,                         /* tp_dict */
-    0,                         /* tp_descr_get */
-    0,                         /* tp_descr_set */
-    0,                         /* tp_dictoffset */
-    (initproc)File_init,       /* tp_init */
-    0,                         /* tp_alloc */
-    File_new,                  /* tp_new */
-  };
+#if PY_MAJOR_VERSION >= 3
+  PyTypeObject smbc_FileType =
+    {
+      PyVarObject_HEAD_INIT(NULL, 0)
+      "smbc.File",               /*tp_name*/
+      sizeof(File),              /*tp_basicsize*/
+      0,                         /*tp_itemsize*/
+      (destructor)File_dealloc,  /*tp_dealloc*/
+      0,                         /*tp_print*/
+      0,                         /*tp_getattr*/
+      0,                         /*tp_setattr*/
+      0,                         /*tp_reserved*/
+      0,                         /*tp_repr*/
+      0,                         /*tp_as_number*/
+      0,                         /*tp_as_sequence*/
+      0,                         /*tp_as_mapping*/
+      0,                         /*tp_hash */
+      0,                         /*tp_call*/
+      0,                         /*tp_str*/
+      0,                         /*tp_getattro*/
+      0,                         /*tp_setattro*/
+      0,                         /*tp_as_buffer*/
+      Py_TPFLAGS_DEFAULT,        /*tp_flags*/
+      "SMBC File\n"
+      "=========\n\n"
+  
+      "  A file object."
+      "",                        /* tp_doc */
+      0,                         /* tp_traverse */
+      0,                         /* tp_clear */
+      0,                         /* tp_richcompare */
+      0,                         /* tp_weaklistoffset */
+      File_iter,                 /* tp_iter */
+      File_iternext,             /* tp_iternext */
+      File_methods,              /* tp_methods */
+      0,                         /* tp_members */
+      0,                         /* tp_getset */
+      0,                         /* tp_base */
+      0,                         /* tp_dict */
+      0,                         /* tp_descr_get */
+      0,                         /* tp_descr_set */
+      0,                         /* tp_dictoffset */
+      (initproc)File_init,       /* tp_init */
+      0,                         /* tp_alloc */
+      File_new,                  /* tp_new */
+    };
+#else
+  PyTypeObject smbc_FileType =
+    {
+      PyObject_HEAD_INIT(NULL)
+      0,                         /*ob_size*/
+      "smbc.File",               /*tp_name*/
+      sizeof(File),              /*tp_basicsize*/
+      0,                         /*tp_itemsize*/
+      (destructor)File_dealloc,  /*tp_dealloc*/
+      0,                         /*tp_print*/
+      0,                         /*tp_getattr*/
+      0,                         /*tp_setattr*/
+      0,                         /*tp_compare*/
+      0,                         /*tp_repr*/
+      0,                         /*tp_as_number*/
+      0,                         /*tp_as_sequence*/
+      0,                         /*tp_as_mapping*/
+      0,                         /*tp_hash */
+      0,                         /*tp_call*/
+      0,                         /*tp_str*/
+      0,                         /*tp_getattro*/
+      0,                         /*tp_setattro*/
+      0,                         /*tp_as_buffer*/
+      Py_TPFLAGS_DEFAULT,        /*tp_flags*/
+      "SMBC File\n"
+      "=========\n\n"
+  
+      "  A file object."
+      "",                        /* tp_doc */
+      0,                         /* tp_traverse */
+      0,                         /* tp_clear */
+      0,                         /* tp_richcompare */
+      0,                         /* tp_weaklistoffset */
+      File_iter,                 /* tp_iter */
+      File_iternext,             /* tp_iternext */
+      File_methods,              /* tp_methods */
+      0,                         /* tp_members */
+      0,                         /* tp_getset */
+      0,                         /* tp_base */
+      0,                         /* tp_dict */
+      0,                         /* tp_descr_get */
+      0,                         /* tp_descr_set */
+      0,                         /* tp_dictoffset */
+      (initproc)File_init,       /* tp_init */
+      0,                         /* tp_alloc */
+      File_new,                  /* tp_new */
+    };
+#endif

@@ -2,9 +2,11 @@
  * pysmbc - Python bindings for libsmbclient
  * Copyright (C) 2002, 2005, 2006, 2007, 2008, 2010  Red Hat, Inc
  * Copyright (C) 2010  Open Source Solution Technology Corporation
+ * Copyright (C) 2010  Patrick Geltinger <patlkli@patlkli.org>
  * Authors:
  *  Tim Waugh <twaugh@redhat.com>
  *  Tsukasa Hamano <hamano@osstech.co.jp>
+ *  Patrick Geltinger <patlkli@patlkli.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -170,7 +172,7 @@ Context_dealloc (Context *self)
       smbc_free_context (self->context, 1);
     }
 
-  self->ob_type->tp_free ((PyObject *) self);
+  Py_TYPE(self)->tp_free ((PyObject *) self);
 }
 
 static PyObject *
@@ -269,7 +271,7 @@ Context_unlink(Context *self, PyObject *args)
 	pysmbc_SetFromErrno();
 	return NULL;
   }
-  return PyInt_FromLong(ret);
+  return PyLong_FromLong(ret);
 }
 
 static PyObject *
@@ -296,7 +298,7 @@ Context_rename(Context *self, PyObject *args)
 	pysmbc_SetFromErrno();
 	return NULL;
   }
-  return PyInt_FromLong(ret);
+  return PyLong_FromLong(ret);
 }
 
 static PyObject *
@@ -350,7 +352,7 @@ Context_mkdir(Context *self, PyObject *args)
 	pysmbc_SetFromErrno();
 	return NULL;
   }
-  return PyInt_FromLong(ret);
+  return PyLong_FromLong(ret);
 }
 
 static PyObject *
@@ -371,7 +373,7 @@ Context_rmdir(Context *self, PyObject *args)
 	pysmbc_SetFromErrno();
 	return NULL;
   }
-  return PyInt_FromLong(ret);
+  return PyLong_FromLong(ret);
 }
 
 static PyObject *
@@ -424,28 +426,33 @@ Context_chmod(Context *self, PyObject *args)
 	pysmbc_SetFromErrno();
 	return NULL;
   }
-  return PyInt_FromLong(ret);
+  return PyLong_FromLong(ret);
 }
 
 static PyObject *
 Context_getDebug (Context *self, void *closure)
 {
   int d = smbc_getDebug (self->context);
-  return PyInt_FromLong (d);
+  return PyLong_FromLong (d);
 }
 
 static int
 Context_setDebug (Context *self, PyObject *value, void *closure)
 {
   int d;
+  
+#if PY_MAJOR_VERSION < 3
+  if (PyInt_Check(value))
+    value = PyLong_FromLong(PyInt_AsLong(value));
+#endif
 
-  if (!PyInt_Check (value))
+  if (!PyLong_Check (value))
     {
       PyErr_SetString (PyExc_TypeError, "must be int");
       return -1;
     }
 
-  d = PyInt_AsLong (value);
+  d = PyLong_AsLong (value);
   smbc_setDebug (self->context, d);
   return 0;
 }
@@ -454,25 +461,61 @@ static PyObject *
 Context_getNetbiosName (Context *self, void *closure)
 {
   const char *netbios_name = smbc_getNetbiosName (self->context);
-  return PyString_FromString (netbios_name);
+  return PyUnicode_FromString (netbios_name);
 }
 
 static int
 Context_setNetbiosName (Context *self, PyObject *value, void *closure)
 {
+  wchar_t *w_name;
+  size_t chars;
   char *name;
+  size_t bytes;
+  ssize_t written;
 
-  if (!PyString_Check (value))
+#if PY_MAJOR_VERSION < 3
+  if (PyString_Check(value))
+    value = PyUnicode_FromString(PyString_AsString(value));
+#endif
+
+  if (!PyUnicode_Check (value))
     {
       PyErr_SetString (PyExc_TypeError, "must be string");
       return -1;
     }
 
-  name = strdup (PyString_AsString (value));
-  if (!name)
+  chars = PyUnicode_GetSize (value); /* not including NUL */
+  w_name = malloc((chars + 1) * sizeof (wchar_t));
+  if (!w_name)
     {
+      PyErr_NoMemory ();
       return -1;
     }
+
+  if (PyUnicode_AsWideChar ((PyUnicodeObject *) value, w_name, chars) == -1)
+    {
+      free (w_name);
+      return -1;
+    }
+
+  w_name[chars] = L'\0';
+  bytes = MB_CUR_MAX * chars + 1; /* extra byte for NUL */
+  name = malloc (bytes);
+  if (!name)
+    {
+      free (w_name);
+      PyErr_NoMemory ();
+      return -1;
+    }
+
+  written = wcstombs (name, w_name, bytes);
+  free (w_name);
+
+  if (written == -1)
+    name[0] = '\0';
+  else
+    /* NUL-terminate it (this is why we allocated an extra byte) */
+    name[written] = '\0';
 
   smbc_setNetbiosName (self->context, name);
   // Don't free name: the API function just takes a reference(!)
@@ -483,25 +526,62 @@ static PyObject *
 Context_getWorkgroup (Context *self, void *closure)
 {
   const char *workgroup = smbc_getWorkgroup (self->context);
-  return PyString_FromString (workgroup);
+  return PyUnicode_FromString (workgroup);
 }
 
 static int
 Context_setWorkgroup (Context *self, PyObject *value, void *closure)
 {
+  wchar_t *w_workgroup;
+  size_t chars;
   char *workgroup;
+  size_t bytes;
+  ssize_t written;
 
-  if (!PyString_Check (value))
+#if PY_MAJOR_VERSION < 3
+  if (PyString_Check(value))
+    value = PyUnicode_FromString(PyString_AsString(value));
+#endif
+
+  if (!PyUnicode_Check (value))
     {
       PyErr_SetString (PyExc_TypeError, "must be string");
       return -1;
     }
 
-  workgroup = strdup (PyString_AsString (value));
-  if (!workgroup)
+  chars = PyUnicode_GetSize (value); /* not including NUL */
+  w_workgroup = malloc ((chars + 1) * sizeof (wchar_t));
+  if (!w_workgroup)
     {
+      PyErr_NoMemory ();
       return -1;
     }
+
+  if (PyUnicode_AsWideChar ((PyUnicodeObject *) value,
+			    w_workgroup, chars) == -1)
+    {
+      free (w_workgroup);
+      return -1;
+    }
+
+  w_workgroup[chars] = L'\0';
+  bytes = MB_CUR_MAX * chars + 1; /* extra byte for NUL */
+  workgroup = malloc (bytes);
+  if (!workgroup)
+    {
+      free (w_workgroup);
+      PyErr_NoMemory ();
+      return -1;
+    }
+
+  written = wcstombs (workgroup, w_workgroup, bytes);
+  free (w_workgroup);
+
+  if (written == -1)
+    workgroup[0] = '\0';
+  else
+    /* NUL-terminate it (this is why we allocated the extra byte) */
+    workgroup[written] = '\0';
 
   smbc_setWorkgroup (self->context, workgroup);
   // Don't free workgroup: the API function just takes a reference(!)
@@ -680,58 +760,113 @@ PyMethodDef Context_methods[] =
 
     { NULL } /* Sentinel */
   };
-
-PyTypeObject smbc_ContextType =
-  {
-    PyObject_HEAD_INIT(NULL)
-    0,                         /*ob_size*/
-    "smbc.Context",            /*tp_name*/
-    sizeof(Context),           /*tp_basicsize*/
-    0,                         /*tp_itemsize*/
-    (destructor)Context_dealloc, /*tp_dealloc*/
-    0,                         /*tp_print*/
-    0,                         /*tp_getattr*/
-    0,                         /*tp_setattr*/
-    0,                         /*tp_compare*/
-    0,                         /*tp_repr*/
-    0,                         /*tp_as_number*/
-    0,                         /*tp_as_sequence*/
-    0,                         /*tp_as_mapping*/
-    0,                         /*tp_hash */
-    0,                         /*tp_call*/
-    0,                         /*tp_str*/
-    0,                         /*tp_getattro*/
-    0,                         /*tp_setattro*/
-    0,                         /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,        /*tp_flags*/
-    "SMBC context\n"
-    "============\n\n"
-
-    "  A context for libsmbclient calls.\n\n"
-    "Optional parameters are:\n\n"
-    "auth_fn: a function for collecting authentication details from\n"
-    "the user. This is called whenever authentication details are needed.\n"
-    "The parameters it will be given are all strings: server, share,\n"
-    "workgroup, username, and password (these last two can be ignored).\n"
-    "The function should return a tuple of strings: workgroup, username,\n"
-    "and password.\n\n"
-    "debug: an integer representing the debug level to use.\n"
-    "",                        /* tp_doc */
-    0,                         /* tp_traverse */
-    0,                         /* tp_clear */
-    0,                         /* tp_richcompare */
-    0,                         /* tp_weaklistoffset */
-    0,                         /* tp_iter */
-    0,                         /* tp_iternext */
-    Context_methods,           /* tp_methods */
-    0,                         /* tp_members */
-    Context_getseters,         /* tp_getset */
-    0,                         /* tp_base */
-    0,                         /* tp_dict */
-    0,                         /* tp_descr_get */
-    0,                         /* tp_descr_set */
-    0,                         /* tp_dictoffset */
-    (initproc)Context_init,    /* tp_init */
-    0,                         /* tp_alloc */
-    Context_new,               /* tp_new */
-  };
+#if PY_MAJOR_VERSION >= 3
+  PyTypeObject smbc_ContextType =
+    {
+      PyVarObject_HEAD_INIT(NULL, 0)
+      "smbc.Context",            /*tp_name*/
+      sizeof(Context),           /*tp_basicsize*/
+      0,                         /*tp_itemsize*/
+      (destructor)Context_dealloc, /*tp_dealloc*/
+      0,                         /*tp_print*/
+      0,                         /*tp_getattr*/
+      0,                         /*tp_setattr*/
+      0,                         /*tp_reserved*/
+      0,                         /*tp_repr*/
+      0,                         /*tp_as_number*/
+      0,                         /*tp_as_sequence*/
+      0,                         /*tp_as_mapping*/
+      0,                         /*tp_hash */
+      0,                         /*tp_call*/
+      0,                         /*tp_str*/
+      0,                         /*tp_getattro*/
+      0,                         /*tp_setattro*/
+      0,                         /*tp_as_buffer*/
+      Py_TPFLAGS_DEFAULT,        /*tp_flags*/
+      "SMBC context\n"
+      "============\n\n"
+  
+      "  A context for libsmbclient calls.\n\n"
+      "Optional parameters are:\n\n"
+      "auth_fn: a function for collecting authentication details from\n"
+      "the user. This is called whenever authentication details are needed.\n"
+      "The parameters it will be given are all strings: server, share,\n"
+      "workgroup, username, and password (these last two can be ignored).\n"
+      "The function should return a tuple of strings: workgroup, username,\n"
+      "and password.\n\n"
+      "debug: an integer representing the debug level to use.\n"
+      "",                        /* tp_doc */
+      0,                         /* tp_traverse */
+      0,                         /* tp_clear */
+      0,                         /* tp_richcompare */
+      0,                         /* tp_weaklistoffset */
+      0,                         /* tp_iter */
+      0,                         /* tp_iternext */
+      Context_methods,           /* tp_methods */
+      0,                         /* tp_members */
+      Context_getseters,         /* tp_getset */
+      0,                         /* tp_base */
+      0,                         /* tp_dict */
+      0,                         /* tp_descr_get */
+      0,                         /* tp_descr_set */
+      0,                         /* tp_dictoffset */
+      (initproc)Context_init,    /* tp_init */
+      0,                         /* tp_alloc */
+      Context_new,               /* tp_new */
+    };
+#else
+  PyTypeObject smbc_ContextType =
+    {
+      PyObject_HEAD_INIT(NULL)
+      0,                         /*ob_size*/
+      "smbc.Context",            /*tp_name*/
+      sizeof(Context),           /*tp_basicsize*/
+      0,                         /*tp_itemsize*/
+      (destructor)Context_dealloc, /*tp_dealloc*/
+      0,                         /*tp_print*/
+      0,                         /*tp_getattr*/
+      0,                         /*tp_setattr*/
+      0,                         /*tp_compare*/
+      0,                         /*tp_repr*/
+      0,                         /*tp_as_number*/
+      0,                         /*tp_as_sequence*/
+      0,                         /*tp_as_mapping*/
+      0,                         /*tp_hash */
+      0,                         /*tp_call*/
+      0,                         /*tp_str*/
+      0,                         /*tp_getattro*/
+      0,                         /*tp_setattro*/
+      0,                         /*tp_as_buffer*/
+      Py_TPFLAGS_DEFAULT,        /*tp_flags*/
+      "SMBC context\n"
+      "============\n\n"
+  
+      "  A context for libsmbclient calls.\n\n"
+      "Optional parameters are:\n\n"
+      "auth_fn: a function for collecting authentication details from\n"
+      "the user. This is called whenever authentication details are needed.\n"
+      "The parameters it will be given are all strings: server, share,\n"
+      "workgroup, username, and password (these last two can be ignored).\n"
+      "The function should return a tuple of strings: workgroup, username,\n"
+      "and password.\n\n"
+      "debug: an integer representing the debug level to use.\n"
+      "",                        /* tp_doc */
+      0,                         /* tp_traverse */
+      0,                         /* tp_clear */
+      0,                         /* tp_richcompare */
+      0,                         /* tp_weaklistoffset */
+      0,                         /* tp_iter */
+      0,                         /* tp_iternext */
+      Context_methods,           /* tp_methods */
+      0,                         /* tp_members */
+      Context_getseters,         /* tp_getset */
+      0,                         /* tp_base */
+      0,                         /* tp_dict */
+      0,                         /* tp_descr_get */
+      0,                         /* tp_descr_set */
+      0,                         /* tp_dictoffset */
+      (initproc)Context_init,    /* tp_init */
+      0,                         /* tp_alloc */
+      Context_new,               /* tp_new */
+    };
+#endif

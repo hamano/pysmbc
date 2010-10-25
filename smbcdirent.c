@@ -1,6 +1,7 @@
 /* -*- Mode: C; c-file-style: "gnu" -*-
  * pysmbc - Python bindings for libsmbclient
  * Copyright (C) 2002, 2005, 2006, 2007, 2008  Tim Waugh <twaugh@redhat.com>
+ * Copyright (C) 2010  Patrick Geltinger <patlkli@patlkli.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -84,7 +85,7 @@ Dirent_dealloc (Dirent *self)
 {
   free (self->comment);
   free (self->name);
-  self->ob_type->tp_free ((PyObject *) self);
+  Py_TYPE(self)->tp_free ((PyObject *) self);
 }
 
 static PyObject *
@@ -111,25 +112,25 @@ Dirent_repr (PyObject *self)
 	    dent->smbc_type <= sizeof (types) ?
 	    types[dent->smbc_type] : "?",
 	    dent);
-  return PyString_FromString (s);
+  return PyUnicode_FromString (s);
 }
 
 static PyObject *
 Dirent_getName (Dirent *self, void *closure)
 {
-  return PyString_FromString (self->name);
+  return PyUnicode_FromString (self->name);
 }
 
 static PyObject *
 Dirent_getComment (Dirent *self, void *closure)
 {
-  return PyString_FromString (self->comment);
+  return PyUnicode_FromString (self->comment);
 }
 
 static PyObject *
 Dirent_getSmbcType (Dirent *self, void *closure)
 {
-  return PyInt_FromLong (self->smbc_type);
+  return PyLong_FromLong (self->smbc_type);
 }
 
 PyGetSetDef Dirent_getseters[] =
@@ -149,49 +150,98 @@ PyGetSetDef Dirent_getseters[] =
     { NULL }
   };
 
-PyTypeObject smbc_DirentType =
-  {
-    PyObject_HEAD_INIT(NULL)
-    0,                         /*ob_size*/
-    "smbc.Dirent",             /*tp_name*/
-    sizeof(Dirent),            /*tp_basicsize*/
-    0,                         /*tp_itemsize*/
-    (destructor)Dirent_dealloc,  /*tp_dealloc*/
-    0,                         /*tp_print*/
-    0,                         /*tp_getattr*/
-    0,                         /*tp_setattr*/
-    0,                         /*tp_compare*/
-    Dirent_repr,               /*tp_repr*/
-    0,                         /*tp_as_number*/
-    0,                         /*tp_as_sequence*/
-    0,                         /*tp_as_mapping*/
-    0,                         /*tp_hash */
-    0,                         /*tp_call*/
-    0,                         /*tp_str*/
-    0,                         /*tp_getattro*/
-    0,                         /*tp_setattro*/
-    0,                         /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,        /*tp_flags*/
-    "SMBC Dirent\n"
-    "===========\n\n"
+#if PY_MAJOR_VERSION >= 3
+  PyTypeObject smbc_DirentType =
+    {
+      PyVarObject_HEAD_INIT(NULL, 0)
+      "smbc.Dirent",             /*tp_name*/
+      sizeof(Dirent),            /*tp_basicsize*/
+      0,                         /*tp_itemsize*/
+      (destructor)Dirent_dealloc,  /*tp_dealloc*/
+      0,                         /*tp_print*/
+      0,                         /*tp_getattr*/
+      0,                         /*tp_setattr*/
+      0,                         /*tp_reserved*/
+      Dirent_repr,               /*tp_repr*/
+      0,                         /*tp_as_number*/
+      0,                         /*tp_as_sequence*/
+      0,                         /*tp_as_mapping*/
+      0,                         /*tp_hash */
+      0,                         /*tp_call*/
+      0,                         /*tp_str*/
+      0,                         /*tp_getattro*/
+      0,                         /*tp_setattro*/
+      0,                         /*tp_as_buffer*/
+      Py_TPFLAGS_DEFAULT,        /*tp_flags*/
+      "SMBC Dirent\n"
+      "=========\n\n"
+  
+      "  A directory entry object."
+      "",                        /* tp_doc */
+      0,                         /* tp_traverse */
+      0,                         /* tp_clear */
+      0,                         /* tp_richcompare */
+      0,                         /* tp_weaklistoffset */
+      0,                         /* tp_iter */
+      0,                         /* tp_iternext */
+      0,                         /* tp_methods */
+      0,                         /* tp_members */
+      Dirent_getseters,          /* tp_getset */
+      0,                         /* tp_base */
+      0,                         /* tp_dict */
+      0,                         /* tp_descr_get */
+      0,                         /* tp_descr_set */
+      0,                         /* tp_dictoffset */
+      (initproc)Dirent_init,     /* tp_init */
+      0,                         /* tp_alloc */
+      Dirent_new,                /* tp_new */
+    };
+#else
+  PyTypeObject smbc_DirentType =
+    {
+      PyObject_HEAD_INIT(NULL)
+      0,                         /*ob_size*/
+      "smbc.Dirent",             /*tp_name*/
+      sizeof(Dirent),            /*tp_basicsize*/
+      0,                         /*tp_itemsize*/
+      (destructor)Dirent_dealloc,  /*tp_dealloc*/
+      0,                         /*tp_print*/
+      0,                         /*tp_getattr*/
+      0,                         /*tp_setattr*/
+      0,                         /*tp_compare*/
+      Dirent_repr,               /*tp_repr*/
+      0,                         /*tp_as_number*/
+      0,                         /*tp_as_sequence*/
+      0,                         /*tp_as_mapping*/
+      0,                         /*tp_hash */
+      0,                         /*tp_call*/
+      0,                         /*tp_str*/
+      0,                         /*tp_getattro*/
+      0,                         /*tp_setattro*/
+      0,                         /*tp_as_buffer*/
+      Py_TPFLAGS_DEFAULT,        /*tp_flags*/
+      "SMBC Dirent\n"
+      "=========\n\n"
+  
+      "  A directory entry object."
+      "",                        /* tp_doc */
+      0,                         /* tp_traverse */
+      0,                         /* tp_clear */
+      0,                         /* tp_richcompare */
+      0,                         /* tp_weaklistoffset */
+      0,                         /* tp_iter */
+      0,                         /* tp_iternext */
+      0,                         /* tp_methods */
+      0,                         /* tp_members */
+      Dirent_getseters,          /* tp_getset */
+      0,                         /* tp_base */
+      0,                         /* tp_dict */
+      0,                         /* tp_descr_get */
+      0,                         /* tp_descr_set */
+      0,                         /* tp_dictoffset */
+      (initproc)Dirent_init,     /* tp_init */
+      0,                         /* tp_alloc */
+      Dirent_new,                /* tp_new */
+    };
+#endif
 
-    "  A directory entry object."
-    "",                        /* tp_doc */
-    0,                         /* tp_traverse */
-    0,                         /* tp_clear */
-    0,                         /* tp_richcompare */
-    0,                         /* tp_weaklistoffset */
-    0,                         /* tp_iter */
-    0,                         /* tp_iternext */
-    0,                         /* tp_methods */
-    0,                         /* tp_members */
-    Dirent_getseters,          /* tp_getset */
-    0,                         /* tp_base */
-    0,                         /* tp_dict */
-    0,                         /* tp_descr_get */
-    0,                         /* tp_descr_set */
-    0,                         /* tp_dictoffset */
-    (initproc)Dirent_init,     /* tp_init */
-    0,                         /* tp_alloc */
-    Dirent_new,                /* tp_new */
-  };
