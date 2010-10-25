@@ -1,6 +1,7 @@
 /* -*- Mode: C; c-file-style: "gnu" -*-
  * pysmbc - Python bindings for libsmbclient
  * Copyright (C) 2002, 2005, 2006, 2007, 2008  Tim Waugh <twaugh@redhat.com>
+ * Copyright (C) 2010  Patrick Geltinger <patlkli@patlkli.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -103,7 +104,7 @@ Dir_dealloc (Dir *self)
       Py_DECREF ((PyObject *) self->context);
     }
 
-  self->ob_type->tp_free ((PyObject *) self);
+  Py_TYPE(self)->tp_free ((PyObject *) self);
 }
 
 static PyObject *
@@ -142,9 +143,9 @@ Dir_getdents (Dir *self)
 	  PyObject *largs = Py_BuildValue ("()");
 	  PyObject *lkwlist;
 	  int len = dirp->dirlen;
-	  PyObject *name = PyString_FromString (dirp->name);
-	  PyObject *type = PyInt_FromLong (dirp->smbc_type);
-	  PyObject *comment = PyString_FromString (dirp->comment);
+	  PyObject *name = PyUnicode_FromString (dirp->name);
+	  PyObject *type = PyLong_FromLong (dirp->smbc_type);
+	  PyObject *comment = PyUnicode_FromString (dirp->comment);
 	  lkwlist = PyDict_New ();
 	  PyDict_SetItemString (lkwlist, "name", name);
 	  PyDict_SetItemString (lkwlist, "comment", comment);
@@ -180,49 +181,98 @@ PyMethodDef Dir_methods[] =
     { NULL } /* Sentinel */
   };
 
-PyTypeObject smbc_DirType =
-  {
-    PyObject_HEAD_INIT(NULL)
-    0,                         /*ob_size*/
-    "smbc.Dir",                /*tp_name*/
-    sizeof(Dir),               /*tp_basicsize*/
-    0,                         /*tp_itemsize*/
-    (destructor)Dir_dealloc,  /*tp_dealloc*/
-    0,                         /*tp_print*/
-    0,                         /*tp_getattr*/
-    0,                         /*tp_setattr*/
-    0,                         /*tp_compare*/
-    0,                         /*tp_repr*/
-    0,                         /*tp_as_number*/
-    0,                         /*tp_as_sequence*/
-    0,                         /*tp_as_mapping*/
-    0,                         /*tp_hash */
-    0,                         /*tp_call*/
-    0,                         /*tp_str*/
-    0,                         /*tp_getattro*/
-    0,                         /*tp_setattro*/
-    0,                         /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,        /*tp_flags*/
-    "SMBC Dir\n"
-    "========\n\n"
+#if PY_MAJOR_VERSION >= 3
+  PyTypeObject smbc_DirType =
+    {
+      PyVarObject_HEAD_INIT(NULL, 0)
+      "smbc.Dir",                /*tp_name*/
+      sizeof(Dir),               /*tp_basicsize*/
+      0,                         /*tp_itemsize*/
+      (destructor)Dir_dealloc,  /*tp_dealloc*/
+      0,                         /*tp_print*/
+      0,                         /*tp_getattr*/
+      0,                         /*tp_setattr*/
+      0,                         /*tp_reserved*/
+      0,                         /*tp_repr*/
+      0,                         /*tp_as_number*/
+      0,                         /*tp_as_sequence*/
+      0,                         /*tp_as_mapping*/
+      0,                         /*tp_hash */
+      0,                         /*tp_call*/
+      0,                         /*tp_str*/
+      0,                         /*tp_getattro*/
+      0,                         /*tp_setattro*/
+      0,                         /*tp_as_buffer*/
+      Py_TPFLAGS_DEFAULT,        /*tp_flags*/
+      "SMBC Dir\n"
+      "========\n\n"
+  
+      "  A directory object."
+      "",                        /* tp_doc */
+      0,                         /* tp_traverse */
+      0,                         /* tp_clear */
+      0,                         /* tp_richcompare */
+      0,                         /* tp_weaklistoffset */
+      0,                         /* tp_iter */
+      0,                         /* tp_iternext */
+      Dir_methods,               /* tp_methods */
+      0,                         /* tp_members */
+      0,                         /* tp_getset */
+      0,                         /* tp_base */
+      0,                         /* tp_dict */
+      0,                         /* tp_descr_get */
+      0,                         /* tp_descr_set */
+      0,                         /* tp_dictoffset */
+      (initproc)Dir_init,        /* tp_init */
+      0,                         /* tp_alloc */
+      Dir_new,                   /* tp_new */
+    };
+#else
+  PyTypeObject smbc_DirType =
+    {
+      PyObject_HEAD_INIT(NULL)
+      0,                         /*ob_size*/
+      "smbc.Dir",                /*tp_name*/
+      sizeof(Dir),               /*tp_basicsize*/
+      0,                         /*tp_itemsize*/
+      (destructor)Dir_dealloc,  /*tp_dealloc*/
+      0,                         /*tp_print*/
+      0,                         /*tp_getattr*/
+      0,                         /*tp_setattr*/
+      0,                         /*tp_compare*/
+      0,                         /*tp_repr*/
+      0,                         /*tp_as_number*/
+      0,                         /*tp_as_sequence*/
+      0,                         /*tp_as_mapping*/
+      0,                         /*tp_hash */
+      0,                         /*tp_call*/
+      0,                         /*tp_str*/
+      0,                         /*tp_getattro*/
+      0,                         /*tp_setattro*/
+      0,                         /*tp_as_buffer*/
+      Py_TPFLAGS_DEFAULT,        /*tp_flags*/
+      "SMBC Dir\n"
+      "========\n\n"
+  
+      "  A directory object."
+      "",                        /* tp_doc */
+      0,                         /* tp_traverse */
+      0,                         /* tp_clear */
+      0,                         /* tp_richcompare */
+      0,                         /* tp_weaklistoffset */
+      0,                         /* tp_iter */
+      0,                         /* tp_iternext */
+      Dir_methods,               /* tp_methods */
+      0,                         /* tp_members */
+      0,                         /* tp_getset */
+      0,                         /* tp_base */
+      0,                         /* tp_dict */
+      0,                         /* tp_descr_get */
+      0,                         /* tp_descr_set */
+      0,                         /* tp_dictoffset */
+      (initproc)Dir_init,        /* tp_init */
+      0,                         /* tp_alloc */
+      Dir_new,                   /* tp_new */
+    };
+#endif
 
-    "  A directory object."
-    "",                        /* tp_doc */
-    0,                         /* tp_traverse */
-    0,                         /* tp_clear */
-    0,                         /* tp_richcompare */
-    0,                         /* tp_weaklistoffset */
-    0,                         /* tp_iter */
-    0,                         /* tp_iternext */
-    Dir_methods,               /* tp_methods */
-    0,                         /* tp_members */
-    0,                         /* tp_getset */
-    0,                         /* tp_base */
-    0,                         /* tp_dict */
-    0,                         /* tp_descr_get */
-    0,                         /* tp_descr_set */
-    0,                         /* tp_dictoffset */
-    (initproc)Dir_init,        /* tp_init */
-    0,                         /* tp_alloc */
-    Dir_new,                   /* tp_new */
-  };
