@@ -1,6 +1,11 @@
 NEWS
 ----
 
+New in 1.0.10:
+
+* smbc.NoSpaceError
+* Now compiles against Python 3
+
 New in 1.0.9:
 
 * iteration file read
