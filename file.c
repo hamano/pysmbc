@@ -162,7 +162,11 @@ File_read(File *self, PyObject *args)
 	free(buf);
 	return NULL;
   }
+#if PY_MAJOR_VERSION >= 3
   ret = PyUnicode_FromStringAndSize(buf, len);
+#else
+  ret = PyString_FromStringAndSize(buf, len);
+#endif
   free(buf);
   return ret;
 }
@@ -249,7 +253,11 @@ File_iternext(PyObject *self)
   fn = smbc_getFunctionRead(ctx->context);
   len = (*fn)(ctx->context, file->file, buf, 2048);
   if(len > 0){
+#if PY_MAJOR_VERSION >= 3
 	return PyUnicode_FromStringAndSize(buf, len);
+#else
+	return PyString_FromStringAndSize(buf, len);
+#endif
   }else if(len == 0){
 	PyErr_SetNone(PyExc_StopIteration);
   }else{
