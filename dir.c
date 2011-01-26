@@ -143,9 +143,15 @@ Dir_getdents (Dir *self)
 	  PyObject *largs = Py_BuildValue ("()");
 	  PyObject *lkwlist;
 	  int len = dirp->dirlen;
+
+#if PY_MAJOR_VERSION >= 3
 	  PyObject *name = PyUnicode_FromString (dirp->name);
-	  PyObject *type = PyLong_FromLong (dirp->smbc_type);
 	  PyObject *comment = PyUnicode_FromString (dirp->comment);
+#else
+	  PyObject *name = PyString_FromString (dirp->name);
+	  PyObject *comment = PyString_FromString (dirp->comment);
+#endif
+	  PyObject *type = PyLong_FromLong (dirp->smbc_type);
 	  lkwlist = PyDict_New ();
 	  PyDict_SetItemString (lkwlist, "name", name);
 	  PyDict_SetItemString (lkwlist, "comment", comment);
