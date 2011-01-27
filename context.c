@@ -588,6 +588,26 @@ Context_setWorkgroup (Context *self, PyObject *value, void *closure)
   return 0;
 }
 
+static PyObject *
+Context_getTimeout (Context *self, void *closure)
+{
+  int timeout = smbc_getTimeout (self->context);
+  return PyLong_FromLong (timeout);
+}
+
+static int
+Context_setTimeout (Context *self, PyObject *value, void *closure)
+{
+  if (!PyInt_Check (value))
+    {
+      PyErr_SetString (PyExc_TypeError, "must be long");
+      return -1;
+    }
+
+  smbc_setTimeout (self->context, PyInt_AsLong (value));
+  return 0;
+}
+
 static int
 Context_setFunctionAuthData (Context *self, PyObject *value, void *closure)
 {
@@ -665,6 +685,12 @@ PyGetSetDef Context_getseters[] =
       (getter) Context_getWorkgroup,
       (setter) Context_setWorkgroup,
       "Workgroup used for making connections.",
+      NULL },
+
+    { "timeout",
+      (getter) Context_getTimeout,
+      (setter) Context_setTimeout,
+      "Get the timeout used for waiting on connections and response data(in milliseconds)",
       NULL },
 
     { "functionAuthData",
