@@ -94,16 +94,19 @@ File_init (File *self, PyObject *args, PyObject *kwds)
   Py_INCREF (ctxobj);
   ctx = (Context *) ctxobj;
   self->context = ctx;
-  if(uri){
-	fn = smbc_getFunctionOpen (ctx->context);
-	file = (*fn) (ctx->context, uri, (int) flags, (mode_t) mode);
-	if (file == NULL)
-	  {
-		pysmbc_SetFromErrno();
-		return -1;
-	  }
-	self->file = file;
-  }
+  if (uri)
+    {
+      fn = smbc_getFunctionOpen (ctx->context);
+      file = (*fn) (ctx->context, uri, (int) flags, (mode_t) mode);
+      if (file == NULL)
+	{
+	  pysmbc_SetFromErrno();
+	  return -1;
+	}
+
+      self->file = file;
+    }
+
   debugprintf ("%p open()\n", self->file);
   debugprintf ("%p <- File_init() = 0\n", self->file);
   return 0;
@@ -122,15 +125,13 @@ File_dealloc (File *self)
     }
 
   if (self->context)
-    {
-      Py_DECREF ((PyObject *) self->context);
-    }
+    Py_DECREF ((PyObject *) self->context);
 
-  Py_TYPE(self)->tp_free ((PyObject *) self);
+  Py_TYPE (self)->tp_free ((PyObject *) self);
 }
 
 static PyObject *
-File_read(File *self, PyObject *args)
+File_read (File *self, PyObject *args)
 {
   Context *ctx = self->context;
   size_t size = 0;
@@ -141,38 +142,41 @@ File_read(File *self, PyObject *args)
   smbc_fstat_fn fn_fstat;
   struct stat st;
 
-  if(!PyArg_ParseTuple(args, "|k", &size)){
+  if (!PyArg_ParseTuple (args, "|k", &size))
 	return NULL;
-  }
-  fn = smbc_getFunctionRead(ctx->context);
 
-  if(size == 0){
-	fn_fstat = smbc_getFunctionFstat(ctx->context);
-	(*fn_fstat)(ctx->context, self->file, &st);
-	size = st.st_size;
-  }
+  fn = smbc_getFunctionRead (ctx->context);
 
-  buf = (char *)malloc(size);
-  if(!buf){
-	return PyErr_NoMemory();
-  }
-  len = (*fn)(ctx->context, self->file, buf, size);
-  if(len < 0){
-	pysmbc_SetFromErrno();
-	free(buf);
-	return NULL;
-  }
+  if (size == 0)
+    {
+      fn_fstat = smbc_getFunctionFstat (ctx->context);
+      (*fn_fstat) (ctx->context, self->file, &st);
+      size = st.st_size;
+    }
+
+  buf = (char *) malloc(size);
+  if (!buf)
+    return PyErr_NoMemory ();
+
+  len = (*fn) (ctx->context, self->file, buf, size);
+  if (len < 0)
+    {
+      pysmbc_SetFromErrno ();
+      free (buf);
+      return NULL;
+    }
+
 #if PY_MAJOR_VERSION >= 3
-  ret = PyBytes_FromStringAndSize(buf, len);
+  ret = PyBytes_FromStringAndSize (buf, len);
 #else
-  ret = PyString_FromStringAndSize(buf, len);
+  ret = PyString_FromStringAndSize (buf, len);
 #endif
-  free(buf);
+  free (buf);
   return ret;
 }
 
 static PyObject *
-File_write(File *self, PyObject *args)
+File_write (File *self, PyObject *args)
 {
   Context *ctx = self->context;
   int size = 0;
@@ -180,94 +184,102 @@ File_write(File *self, PyObject *args)
   char *buf;
   ssize_t len;
 
-  if(!PyArg_ParseTuple(args, "s#", &buf, &size)){
-	return NULL;
-  }
-  fn = smbc_getFunctionWrite(ctx->context);
-  len = (*fn)(ctx->context, self->file, buf, size);
-  if(len < 0){
-	pysmbc_SetFromErrno();
-	return NULL;
-  }
-  return PyLong_FromLong(len);
+  if (!PyArg_ParseTuple (args, "s#", &buf, &size))
+    return NULL;
+
+  fn = smbc_getFunctionWrite (ctx->context);
+  len = (*fn) (ctx->context, self->file, buf, size);
+  if (len < 0)
+    {
+      pysmbc_SetFromErrno ();
+      return NULL;
+    }
+
+  return PyLong_FromLong (len);
 }
 
 static PyObject *
-File_fstat(File *self, PyObject *args)
+File_fstat (File *self, PyObject *args)
 {
   Context *ctx = self->context;
   smbc_fstat_fn fn;
   struct stat st;
   int ret;
 
-  fn = smbc_getFunctionFstat(ctx->context);
+  fn = smbc_getFunctionFstat (ctx->context);
   errno = 0;
-  ret = (*fn)(ctx->context, self->file, &st);
-  if(ret < 0){
-	pysmbc_SetFromErrno();
-	return NULL;
-  }
-  return Py_BuildValue("(IKKKIIKIII)",
-					   st.st_mode,
-					   (unsigned long long)st.st_ino,
-					   (unsigned long long)st.st_dev,
-					   (unsigned long long)st.st_nlink,
-					   st.st_uid,
-					   st.st_gid,
-					   st.st_size,
-					   st.st_atime,
-					   st.st_mtime,
-					   st.st_ctime);
+  ret = (*fn) (ctx->context, self->file, &st);
+  if (ret < 0)
+    {
+      pysmbc_SetFromErrno ();
+      return NULL;
+    }
+
+  return Py_BuildValue ("(IKKKIIKIII)",
+			st.st_mode,
+			(unsigned long long)st.st_ino,
+			(unsigned long long)st.st_dev,
+			(unsigned long long)st.st_nlink,
+			st.st_uid,
+			st.st_gid,
+			st.st_size,
+			st.st_atime,
+			st.st_mtime,
+			st.st_ctime);
 }
 
 static PyObject *
-File_close(File *self, PyObject *args)
+File_close (File *self, PyObject *args)
 {
   Context *ctx = self->context;
   smbc_close_fn fn;
   int ret = 0;
 
-  fn = smbc_getFunctionClose(ctx->context);
-  if(self->file){
-	ret = (*fn)(ctx->context, self->file);
-	self->file = NULL;
-  }
-  return PyLong_FromLong(ret);
+  fn = smbc_getFunctionClose (ctx->context);
+  if (self->file)
+    {
+      ret = (*fn) (ctx->context, self->file);
+      self->file = NULL;
+    }
+
+  return PyLong_FromLong (ret);
 }
 
 static PyObject *
-File_iter(PyObject *self)
+File_iter (PyObject *self)
 {
-  Py_INCREF(self);
+  Py_INCREF (self);
   return self;
 }
 
 static PyObject *
-File_iternext(PyObject *self)
+File_iternext (PyObject *self)
 {
-  File *file = (File *)self;
+  File *file = (File *) self;
   Context *ctx = file->context;
   smbc_read_fn fn;
   char buf[2048];
   ssize_t len;
-  fn = smbc_getFunctionRead(ctx->context);
-  len = (*fn)(ctx->context, file->file, buf, 2048);
-  if(len > 0){
+  fn = smbc_getFunctionRead (ctx->context);
+  len = (*fn) (ctx->context, file->file, buf, 2048);
+  if (len > 0)
+    {
 #if PY_MAJOR_VERSION >= 3
-	return PyBytes_FromStringAndSize(buf, len);
+      return PyBytes_FromStringAndSize (buf, len);
 #else
-	return PyString_FromStringAndSize(buf, len);
+      return PyString_FromStringAndSize (buf, len);
 #endif
-  }else if(len == 0){
-	PyErr_SetNone(PyExc_StopIteration);
-  }else{
-	pysmbc_SetFromErrno();
-  }
+    }
+  else if (len == 0)
+    PyErr_SetNone (PyExc_StopIteration);
+  else
+    pysmbc_SetFromErrno ();
+
   return NULL;
 }
 
 static PyObject *
-File_lseek(File *self, PyObject *args)
+File_lseek (File *self, PyObject *args)
 {
   Context *ctx = self->context;
   smbc_lseek_fn fn;
@@ -276,21 +288,24 @@ File_lseek(File *self, PyObject *args)
   int whence=0;
   off_t ret;
 
-  if(!PyArg_ParseTuple(args, (OFF_T_FORMAT "|i"), &py_offset, &whence)){
-	return NULL;
-  }
+  if (!PyArg_ParseTuple (args, (OFF_T_FORMAT "|i"), &py_offset, &whence))
+    return NULL;
+
   offset = py_offset;
+
   /* check for data loss from cast */
-  if ((off_t_long)offset != py_offset) {
-	PyErr_SetString(PyExc_OverflowError, "Data loss in casting off_t");
-  }
-  fn = smbc_getFunctionLseek(ctx->context);
-  ret = (*fn)(ctx->context, self->file, offset, whence);
-  if(ret < 0){
-	pysmbc_SetFromErrno();
-	return NULL;
-  }
-  return Py_BuildValue(OFF_T_FORMAT, ret);
+  if ((off_t_long) offset != py_offset)
+    PyErr_SetString(PyExc_OverflowError, "Data loss in casting off_t");
+
+  fn = smbc_getFunctionLseek (ctx->context);
+  ret = (*fn) (ctx->context, self->file, offset, whence);
+  if (ret < 0)
+    {
+      pysmbc_SetFromErrno ();
+      return NULL;
+    }
+
+  return Py_BuildValue (OFF_T_FORMAT, ret);
 }
 
 PyMethodDef File_methods[] =
