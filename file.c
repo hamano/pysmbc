@@ -1,6 +1,6 @@
 /* -*- Mode: C; c-file-style: "gnu" -*-
  * pysmbc - Python bindings for libsmbclient
- * Copyright (C) 2002, 2005, 2006, 2007, 2008, 2010  Red Hat, Inc
+ * Copyright (C) 2002, 2005, 2006, 2007, 2008, 2010, 2011  Red Hat, Inc
  * Copyright (C) 2010  Open Source Solution Technology Corporation
  * Copyright (C) 2010  Patrick Geltinger <patlkli@patlkli.org>
  * Authors:
@@ -163,7 +163,7 @@ File_read(File *self, PyObject *args)
 	return NULL;
   }
 #if PY_MAJOR_VERSION >= 3
-  ret = PyUnicode_FromStringAndSize(buf, len);
+  ret = PyBytes_FromStringAndSize(buf, len);
 #else
   ret = PyString_FromStringAndSize(buf, len);
 #endif
@@ -254,7 +254,7 @@ File_iternext(PyObject *self)
   len = (*fn)(ctx->context, file->file, buf, 2048);
   if(len > 0){
 #if PY_MAJOR_VERSION >= 3
-	return PyUnicode_FromStringAndSize(buf, len);
+	return PyBytes_FromStringAndSize(buf, len);
 #else
 	return PyString_FromStringAndSize(buf, len);
 #endif
