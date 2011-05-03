@@ -109,7 +109,7 @@ Dirent_repr (PyObject *self)
   char s[1024];
   snprintf (s, sizeof (s),
 	    "<smbc.Dirent object \"%s\" (%s) at %p>", dent->name,
-	    dent->smbc_type <= sizeof (types) ?
+	    dent->smbc_type < (sizeof (types) / sizeof *(types)) ?
 	    types[dent->smbc_type] : "?",
 	    dent);
   return PyUnicode_FromString (s);
