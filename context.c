@@ -1,6 +1,6 @@
 /* -*- Mode: C; c-file-style: "gnu" -*-
  * pysmbc - Python bindings for libsmbclient
- * Copyright (C) 2002, 2005, 2006, 2007, 2008, 2010  Red Hat, Inc
+ * Copyright (C) 2002, 2005, 2006, 2007, 2008, 2010, 2011  Red Hat, Inc
  * Copyright (C) 2010  Open Source Solution Technology Corporation
  * Copyright (C) 2010  Patrick Geltinger <patlkli@patlkli.org>
  * Authors:
@@ -667,6 +667,50 @@ Context_setOptionNoAutoAnonymousLogin (Context *self, PyObject *value,
   return 0;
 }
 
+static PyObject *
+Context_getOptionUseKerberos (Context *self, void *closure)
+{
+  smbc_bool b;
+  b = smbc_getOptionUseKerberos (self->context);
+  return PyBool_FromLong ((long) b);
+}
+
+static int
+Context_setOptionUseKerberos (Context *self, PyObject *value,
+			      void *closure)
+{
+  if (!PyBool_Check (value))
+    {
+      PyErr_SetString (PyExc_TypeError, "must be Boolean");
+      return -1;
+    }
+
+  smbc_setOptionUseKerberos (self->context, value == Py_True);
+  return 0;
+}
+
+static PyObject *
+Context_getOptionFallbackAfterKerberos (Context *self, void *closure)
+{
+  smbc_bool b;
+  b = smbc_getOptionFallbackAfterKerberos (self->context);
+  return PyBool_FromLong ((long) b);
+}
+
+static int
+Context_setOptionFallbackAfterKerberos (Context *self, PyObject *value,
+					void *closure)
+{
+  if (!PyBool_Check (value))
+    {
+      PyErr_SetString (PyExc_TypeError, "must be Boolean");
+      return -1;
+    }
+
+  smbc_setOptionFallbackAfterKerberos (self->context, value == Py_True);
+  return 0;
+}
+
 PyGetSetDef Context_getseters[] =
   {
     { "debug",
@@ -709,6 +753,18 @@ PyGetSetDef Context_getseters[] =
       (getter) Context_getOptionNoAutoAnonymousLogin,
       (setter) Context_setOptionNoAutoAnonymousLogin,
       "Whether to automatically select anonymous login.",
+      NULL },
+
+    { "optionUseKerberos",
+      (getter) Context_getOptionUseKerberos,
+      (setter) Context_setOptionUseKerberos,
+      "Whether to enable use of Kerberos.",
+      NULL },
+
+    { "optionFallbackAfterKerberos",
+      (getter) Context_getOptionFallbackAfterKerberos,
+      (setter) Context_setOptionFallbackAfterKerberos,
+      "Whether to fallback after Kerberos.",
       NULL },
 
     { NULL }
