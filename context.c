@@ -598,13 +598,13 @@ Context_getTimeout (Context *self, void *closure)
 static int
 Context_setTimeout (Context *self, PyObject *value, void *closure)
 {
-  if (!PyInt_Check (value))
+  if (!PyLong_Check (value))
     {
       PyErr_SetString (PyExc_TypeError, "must be long");
       return -1;
     }
 
-  smbc_setTimeout (self->context, PyInt_AsLong (value));
+  smbc_setTimeout (self->context, PyLong_AsLong (value));
   return 0;
 }
 
