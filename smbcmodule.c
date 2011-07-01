@@ -43,6 +43,7 @@ PyObject *TimedOutError;
 PyObject *NoSpaceError;
 
 #if PY_MAJOR_VERSION >= 3
+  #define PYSMBC_INIT_ERROR NULL
   static struct PyModuleDef smbc_module = {
     PyModuleDef_HEAD_INIT,
     "smbc",
@@ -54,6 +55,7 @@ PyObject *NoSpaceError;
 PyObject *
 PyInit_smbc (void)
 #else
+#define PYSMBC_INIT_ERROR
 void
 initsmbc (void)
 #endif
@@ -67,22 +69,22 @@ initsmbc (void)
 
   // Context type
   if (PyType_Ready (&smbc_ContextType) < 0)
-    return;
+    return PYSMBC_INIT_ERROR;
   PyModule_AddObject (m, "Context", (PyObject *) &smbc_ContextType);
 
   // Dir type
   if (PyType_Ready (&smbc_DirType) < 0)
-    return;
+    return PYSMBC_INIT_ERROR;
   PyModule_AddObject (m, "Dir", (PyObject *) &smbc_DirType);
 
   // File type
   if (PyType_Ready (&smbc_FileType) < 0)
-    return;
+    return PYSMBC_INIT_ERROR;
   PyModule_AddObject (m, "File", (PyObject *) &smbc_FileType);
 
   // Dirent type
   if (PyType_Ready (&smbc_DirentType) < 0)
-    return;
+    return PYSMBC_INIT_ERROR;
   PyModule_AddObject (m, "Dirent", (PyObject *) &smbc_DirentType);
 
 #define INT_CONSTANT(prefix, name)			\
