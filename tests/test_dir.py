@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import unittest
 import smbc
 import settings
 import stat
@@ -26,7 +25,6 @@ def test_Mkdir():
     assert(ret == 0)
 
 def test_MkdirFail():
-    print testdir
     try:
         ret = ctx.mkdir(testdir)
     except smbc.ExistsError:
