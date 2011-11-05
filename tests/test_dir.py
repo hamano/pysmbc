@@ -70,3 +70,4 @@ def test_Rmdir():
 def test_Cleanup():
     ret = ctx.rmdir(testdir)
     assert(ret == 0)
+
