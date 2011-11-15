@@ -62,9 +62,9 @@ PyObject *NoSpaceError;
 	#define PYSMBC_MODULE_CREATOR Py_InitModule ("smbc", SmbcMethods)
 #endif
 
- PYSMBC_PROTOTYPE_HEADER
+PYSMBC_PROTOTYPE_HEADER
 {
- PyObject *m = PYSMBC_MODULE_CREATOR;
+  PyObject *m = PYSMBC_MODULE_CREATOR;
 
   PyObject *d = PyModule_GetDict (m);
 

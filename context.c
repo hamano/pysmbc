@@ -491,33 +491,66 @@ Context_getxattr(Context *self, PyObject *args)
  *                     system.nt_sec_desc.*
  *                     system.nt_sec_desc.*+
  * 		       system.nt_sec_desc.ACL:<type>/<flags>/<mask>
+ *
+ * @param value     The value to be assigned to the specified attribute name.
+ *                  This buffer should contain only the attribute value if the
+ *                  name was of the "system.nt_sec_desc.<attribute_name>"
+ *                  form.  If the name was of the "system.nt_sec_desc.*" form
+ *                  then a complete security descriptor, with name:value pairs
+ *                  separated by tabs, commas, or newlines (not spaces!),
+ *                  should be provided in this value buffer.  A complete
+ *                  security descriptor will contain one or more entries
+ *                  selected from the following:
+ *
+ *                    REVISION:<revision number>
+ *                    OWNER:<sid or name>
+ *                    GROUP:<sid or name>
+ *                    ACL:<sid or name>:<type>/<flags>/<mask>
+ *
+ *                  The  revision of the ACL specifies the internal Windows NT
+ *                  ACL revision for the security descriptor. If not specified
+ *                  it defaults to  1.  Using values other than 1 may cause
+ *                  strange behaviour.
+ *
+ *                  The owner and group specify the owner and group sids for
+ *                  the object. If the attribute name (either '*+' with a
+ *                  complete security descriptor, or individual 'owner+' or
+ *                  'group+' attribute names) ended with a plus sign, the
+ *                  specified name is resolved to a SID value, using the
+ *                  server on which the file or directory resides.  Otherwise,
+ *                  the value should be provided in SID-printable format as
+ *                  S-1-x-y-z, and is used directly.  The <sid or name>
+ *                  associated with the ACL: attribute should be provided
+ *                  similarly.
+ *
   */
 
-static PyObject *
+static int
 Context_setxattr(Context *self, PyObject *args)
 {
   int ret;
   char *uri = NULL;
   char *name = NULL;
-  char value[1024];
+  char *value = NULL;
   int flags;
-  bzero(value,1024);
   static smbc_setxattr_fn fn;
 
   // smbc_setxattr takes two string parameters
-  if(!PyArg_ParseTuple (args, "ss", &uri, &name)) {
-        return NULL;
+  if(!PyArg_ParseTuple (args, "sssd", &uri, &name, &value, &flags)) {
+        return -1;
   }
-
+  if (!value) {
+	  return -1;
+  }
   errno = 0;
   fn = smbc_getFunctionSetxattr(self->context);
-  ret = (*fn)(self->context, uri, name, value , 1024 , flags);
+  ret = (*fn)(self->context, uri, name, value , strlen(value) , flags);
 
   if(ret < 0){
         pysmbc_SetFromErrno();
-        return NULL;
+        return -1;
   }
-  return PyUnicode_FromString(value);
+  return 0;
 }
 
 
@@ -1000,7 +1033,11 @@ PyMethodDef Context_methods[] =
 "                  The plus sign ('+') indicates that SIDs should be mapped\n"
 "                  to names.  Without the plus sign, SIDs are not mapped;\n"
 "                  rather they are simply converted to a string format.\n"
-      "@return: a string representing the actual extended attributes of the uri" },
+      "@type	string\n"
+      "@param value - a string representing the acl\n"
+      "@type	int\n"
+      "@param flags - XATTR_FLAG_CREATE or XATTR_FLAG_REPLACE\n"
+      "@return: 0 on success" },
     { NULL } /* Sentinel */
   };
 #if PY_MAJOR_VERSION >= 3
