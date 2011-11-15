@@ -532,11 +532,11 @@ Context_setxattr(Context *self, PyObject *args)
   char *uri = NULL;
   char *name = NULL;
   char *value = NULL;
-  int flags;
+  unsigned int flags;
   static smbc_setxattr_fn fn;
 
   // smbc_setxattr takes two string parameters
-  if(!PyArg_ParseTuple (args, "sssd", &uri, &name, &value, &flags)) {
+  if(!PyArg_ParseTuple (args, "sssi", &uri, &name, &value, &flags)) {
         return -1;
   }
   if (!value) {
