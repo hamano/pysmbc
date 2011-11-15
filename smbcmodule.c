@@ -7,6 +7,8 @@
  *  Tim Waugh <twaugh@redhat.com>
  *  Tsukasa Hamano <hamano@osstech.co.jp>
  *  Patrick Geltinger <patlkli@patlkli.org>
+ *  Fabio Isgrò <fisgro@babel.it>
+ *  Roberto Polli <rpolli@babel.it>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,19 +54,18 @@ PyObject *NoSpaceError;
     SmbcMethods
   };
 
-PyObject *
-PyInit_smbc (void)
+	#define PYSMBC_PROTOTYPE_HEADER PyObject * PyInit_smbc (void)
+	#define PYSMBC_MODULE_CREATOR PyModule_Create (&smbc_module)
 #else
-#define PYSMBC_INIT_ERROR
-void
-initsmbc (void)
+	#define PYSMBC_INIT_ERROR
+	#define PYSMBC_PROTOTYPE_HEADER void initsmbc (void)
+	#define PYSMBC_MODULE_CREATOR Py_InitModule ("smbc", SmbcMethods)
 #endif
+
+ PYSMBC_PROTOTYPE_HEADER
 {
-#if PY_MAJOR_VERSION >= 3
-    PyObject *m = PyModule_Create (&smbc_module);
-#else
-    PyObject *m = Py_InitModule ("smbc", SmbcMethods);
-#endif
+ PyObject *m = PYSMBC_MODULE_CREATOR;
+
   PyObject *d = PyModule_GetDict (m);
 
   // Context type
@@ -87,6 +88,10 @@ initsmbc (void)
     return PYSMBC_INIT_ERROR;
   PyModule_AddObject (m, "Dirent", (PyObject *) &smbc_DirentType);
 
+  // ACL string constants
+  PyModule_AddStringConstant(m, "ACL_ALL", SMBC_ACL_ALL);
+  PyModule_AddStringConstant(m, "ACL_OWNER", SMBC_ACL_OWNER);
+
 #define INT_CONSTANT(prefix, name)			\
   do							\
   {							\
@@ -104,6 +109,10 @@ initsmbc (void)
   INT_CONSTANT (SMB_CTX_, FLAG_USE_KERBEROS);
   INT_CONSTANT (SMB_CTX_, FLAG_FALLBACK_AFTER_KERBEROS);
   INT_CONSTANT (SMBCCTX_, FLAG_NO_AUTO_ANONYMOUS_LOGON);
+
+  // define constants for ACL
+  INT_CONSTANT (SMBC_, XATTR_FLAG_CREATE);
+  INT_CONSTANT (SMBC_, XATTR_FLAG_REPLACE);
 
   NoEntryError = PyErr_NewException("smbc.NoEntryError", NULL, NULL);
   Py_INCREF(NoEntryError);

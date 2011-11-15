@@ -26,6 +26,10 @@ def touch_file(name):
     dfile.close
     return tmpfile_name
         
+        
+def test_xattr_constants():
+    assert smbc.ACL_ALL
+    
 def test_xattr():
     """
     system.nt_sec_desc.<attribute name>

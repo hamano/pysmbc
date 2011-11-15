@@ -43,4 +43,8 @@ extern PyObject *ExistsError;
 extern PyObject *NotEmptyError;
 extern PyObject *TimedOutError;
 
+#define SMBC_ACL	"system.nt_sec_desc."
+#define SMBC_ACL_ALL SMBC_ACL "*"
+#define SMBC_ACL_OWNER SMBC_ACL "owner"
+
 #endif /* HAVE_SMBCMODULE_H */
