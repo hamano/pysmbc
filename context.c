@@ -471,6 +471,31 @@ Context_getxattr(Context *self, PyObject *args)
 }
 
 
+/**
+ * Wrapper for the smbc_setxattr() smbclient function. From libsmbclient.h
+ * @author fisgro@babel.it, rpolli@babel.it
+ *
+ * @param uri			The smb url of the file or directory to set extended
+ *                  attributes for.
+ *
+ * @param name      The name of an attribute to be retrieved.  Names are of
+ *                  one of the following forms:
+ *
+ *                     system.nt_sec_desc.<attribute name>
+ * 		       system.nt_sec_desc.<attribute name>+
+ * 		       system.nt_sec_desc.revision DANGEROUS!!!
+ * 		       system.nt_sec_desc.owner
+ * 		       system.nt_sec_desc.owner+
+ * 		       system.nt_sec_desc.group
+ * 		       system.nt_sec_desc.group+
+ *                     system.nt_sec_desc.*
+ *                     system.nt_sec_desc.*+
+ * 		       system.nt_sec_desc.ACL:<type>/<flags>/<mask>
+  */
+
+
+
+
 
 static PyObject *
 Context_getDebug (Context *self, void *closure)
@@ -890,6 +915,40 @@ PyMethodDef Context_methods[] =
       "@param uri: URI to scan\n"
       "@type name: string\n"
       "@param name: the acl to get with the following syntax\n"
+      "\n"
+      "                      system.nt_sec_desc.<attribute name>\n"
+"                     system.nt_sec_desc.*\n"
+"                     system.nt_sec_desc.*+\n"
+"                     \n"
+"                  where <attribute name> is one of:\n"
+"                  \n"
+"                     revision\n"
+"                     owner\n"
+"                     owner+\n"
+"                     group\n"
+"                     group+\n"
+"                     acl:<name or sid>\n"
+"                     acl+:<name or sid>\n"
+"                     \n"
+"                  In the forms \"system.nt_sec_desc.*\" and\n"
+"                  \"system.nt_sec_desc.*+\", the asterisk and plus signs are\n"
+"                  literal, i.e. the string is provided exactly as shown, and\n"
+"                  the value parameter will return a complete security\n"
+"                  descriptor with name:value pairs separated by tabs,\n"
+"                  commas, or newlines (not spaces!).\n"
+"\n"
+"                  The plus sign ('+') indicates that SIDs should be mapped\n"
+"                  to names.  Without the plus sign, SIDs are not mapped;\n"
+"                  rather they are simply converted to a string format.\n"
+      "@return: a string representing the actual extended attributes of the uri" },
+      
+       { "setxattr",
+      (PyCFunction) Context_setxattr, METH_VARARGS,
+      "setxattr(uri, the_acl) -> int\n\n"
+      "@type uri: string\n"
+      "@param uri: URI to modify\n"
+      "@type name: string\n"
+      "@param name: the acl to set with the following syntax\n"
       "\n"
       "                      system.nt_sec_desc.<attribute name>\n"
 "                     system.nt_sec_desc.*\n"
