@@ -493,6 +493,32 @@ Context_getxattr(Context *self, PyObject *args)
  * 		       system.nt_sec_desc.ACL:<type>/<flags>/<mask>
   */
 
+static PyObject *
+Context_setxattr(Context *self, PyObject *args)
+{
+  int ret;
+  char *uri = NULL;
+  char *name = NULL;
+  char value[1024];
+  int flags;
+  bzero(value,1024);
+  static smbc_setxattr_fn fn;
+
+  // smbc_setxattr takes two string parameters
+  if(!PyArg_ParseTuple (args, "ss", &uri, &name)) {
+        return NULL;
+  }
+
+  errno = 0;
+  fn = smbc_getFunctionSetxattr(self->context);
+  ret = (*fn)(self->context, uri, name, value , 1024 , flags);
+
+  if(ret < 0){
+        pysmbc_SetFromErrno();
+        return NULL;
+  }
+  return PyUnicode_FromString(value);
+}
 
 
 
