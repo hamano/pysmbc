@@ -28,7 +28,10 @@ def touch_file(name):
         
         
 def test_xattr_constants():
-    assert smbc.ACL_ALL
+    assert smbc.XATTR_ACL 
+    assert smbc.XATTR_OWNER 
+    assert smbc.XATTR_GROUP
+
     
 def test_xattr_get():
     """
@@ -59,23 +62,9 @@ def test_xattr_get():
 def test_xattr_put():
     print "test_xattr_put"
     furl = touch_file("tmpfile_set.out")
-    attrs = ctx.getxattr(furl, smbc.ACL_ALL)
-    print "attrs(%s): %s" % (smbc.ACL_ALL,  attrs)
-    ctx.setxattr(furl, smbc.ACL_ALL, attrs, smbc.XATTR_FLAG_REPLACE)
-    
-def test_acl_parser():
-    acl_s = "REVISION:1,OWNER:S-1-5-21-833659924-920326847-3160110649-3002,GROUP:S-1-22-2-1002,ACL:S-1-5-21-833659924-920326847-3160110649-3002:0/0/0x001e01ff,ACL:S-1-22-2-1002:0/0/0x00120089,ACL:S-1-1-0:0/0/0x00120089"
-    acl = dict()
-    acl["ACL"] = []
-    for i in acl_s.split(","):
-        k,v = i.split(":")
-        if k != "ACL":
-            acl[k] = v
-        else:
-            acl[k].append(v)
-    
-    print "aci: %s" % acl
-    assert False
+    attrs = ctx.getxattr(furl, smbc.XATTR_ALL)
+    print "attrs(%s): %s" % (smbc.XATTR_ALL,  attrs)
+    ctx.setxattr(furl, smbc.XATTR_ALL, attrs, smbc.XATTR_FLAG_REPLACE)
     
 def test_Workgroup():
     list = ctx.opendir('smb://').getdents()

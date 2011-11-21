@@ -43,8 +43,16 @@ extern PyObject *ExistsError;
 extern PyObject *NotEmptyError;
 extern PyObject *TimedOutError;
 
-#define SMBC_ACL	"system.nt_sec_desc."
-#define SMBC_ACL_ALL SMBC_ACL "*"
-#define SMBC_ACL_OWNER SMBC_ACL "owner"
+#define SMBC_XATTR							"system.nt_sec_desc."
+#define SMBC_XATTR_ALL 					SMBC_XATTR "*"
+#define SMBC_XATTR_ALL_SID			SMBC_XATTR "+"
+#define SMBC_XATTR_REVISION 		SMBC_XATTR "revision"
+#define SMBC_XATTR_OWNER			SMBC_XATTR "owner"
+#define SMBC_XATTR_OWNER_SID	SMBC_XATTR_OWNER "+"
+#define SMBC_XATTR_GROUP 			SMBC_XATTR "group"
+#define SMBC_XATTR_GROUP_SID 	SMBC_XATTR_GROUP "+"
+#define SMBC_XATTR_ACL 				SMBC_XATTR "acl"
+#define SMBC_XATTR_ACL_SID			SMBC_XATTR_ACL "+"
+
 
 #endif /* HAVE_SMBCMODULE_H */

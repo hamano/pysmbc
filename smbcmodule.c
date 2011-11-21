@@ -89,8 +89,15 @@ PYSMBC_PROTOTYPE_HEADER
   PyModule_AddObject (m, "Dirent", (PyObject *) &smbc_DirentType);
 
   // ACL string constants
-  PyModule_AddStringConstant(m, "ACL_ALL", SMBC_ACL_ALL);
-  PyModule_AddStringConstant(m, "ACL_OWNER", SMBC_ACL_OWNER);
+  PyModule_AddStringConstant(m, "XATTR_ALL", SMBC_XATTR_ALL);
+  PyModule_AddStringConstant(m, "XATTR_ALL_SID", SMBC_XATTR_ALL_SID);
+  PyModule_AddStringConstant(m, "XATTR_GROUP", SMBC_XATTR_GROUP);
+  PyModule_AddStringConstant(m, "XATTR_GROUP_SID", SMBC_XATTR_GROUP_SID);
+  PyModule_AddStringConstant(m, "XATTR_OWNER", SMBC_XATTR_OWNER);
+  PyModule_AddStringConstant(m, "XATTR_OWNER_SID", SMBC_XATTR_OWNER_SID);
+  PyModule_AddStringConstant(m, "XATTR_ACL", SMBC_XATTR_ACL);
+  PyModule_AddStringConstant(m, "XATTR_ACL_SID", SMBC_XATTR_ACL_SID);
+  PyModule_AddStringConstant(m, "XATTR_REVISION", SMBC_XATTR_REVISION);
 
 #define INT_CONSTANT(prefix, name)			\
   do							\
