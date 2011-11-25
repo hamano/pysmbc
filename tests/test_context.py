@@ -26,7 +26,14 @@ def touch_file(name):
     dfile.close
     return tmpfile_name
         
-def test_xattr():
+        
+def test_xattr_constants():
+    assert smbc.XATTR_ACL 
+    assert smbc.XATTR_OWNER 
+    assert smbc.XATTR_GROUP
+
+    
+def test_xattr_get():
     """
     system.nt_sec_desc.<attribute name>
  *                     system.nt_sec_desc.*
@@ -52,6 +59,13 @@ def test_xattr():
         assert(ctx.getxattr(furl, xattr))
     ctx.open(furl)
 
+def test_xattr_put():
+    print "test_xattr_put"
+    furl = touch_file("tmpfile_set.out")
+    attrs = ctx.getxattr(furl, smbc.XATTR_ALL)
+    print "attrs(%s): %s" % (smbc.XATTR_ALL,  attrs)
+    ctx.setxattr(furl, smbc.XATTR_ALL, attrs, smbc.XATTR_FLAG_REPLACE)
+    
 def test_Workgroup():
     list = ctx.opendir('smb://').getdents()
     assert(len(list) > 0)

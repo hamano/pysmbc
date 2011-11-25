@@ -471,6 +471,90 @@ Context_getxattr(Context *self, PyObject *args)
 }
 
 
+/**
+ * Wrapper for the smbc_setxattr() smbclient function. From libsmbclient.h
+ * @author fisgro@babel.it, rpolli@babel.it
+ *
+ * @param uri			The smb url of the file or directory to set extended
+ *                  attributes for.
+ *
+ * @param name      The name of an attribute to be retrieved.  Names are of
+ *                  one of the following forms:
+ *
+ *                     system.nt_sec_desc.<attribute name>
+ * 		       system.nt_sec_desc.<attribute name>+
+ * 		       system.nt_sec_desc.revision DANGEROUS!!!
+ * 		       system.nt_sec_desc.owner
+ * 		       system.nt_sec_desc.owner+
+ * 		       system.nt_sec_desc.group
+ * 		       system.nt_sec_desc.group+
+ *                     system.nt_sec_desc.*
+ *                     system.nt_sec_desc.*+
+ * 		       system.nt_sec_desc.ACL:<type>/<flags>/<mask>
+ *
+ * @param value     The value to be assigned to the specified attribute name.
+ *                  This buffer should contain only the attribute value if the
+ *                  name was of the "system.nt_sec_desc.<attribute_name>"
+ *                  form.  If the name was of the "system.nt_sec_desc.*" form
+ *                  then a complete security descriptor, with name:value pairs
+ *                  separated by tabs, commas, or newlines (not spaces!),
+ *                  should be provided in this value buffer.  A complete
+ *                  security descriptor will contain one or more entries
+ *                  selected from the following:
+ *
+ *                    REVISION:<revision number>
+ *                    OWNER:<sid or name>
+ *                    GROUP:<sid or name>
+ *                    ACL:<sid or name>:<type>/<flags>/<mask>
+ *
+ *                  The  revision of the ACL specifies the internal Windows NT
+ *                  ACL revision for the security descriptor. If not specified
+ *                  it defaults to  1.  Using values other than 1 may cause
+ *                  strange behaviour.
+ *
+ *                  The owner and group specify the owner and group sids for
+ *                  the object. If the attribute name (either '*+' with a
+ *                  complete security descriptor, or individual 'owner+' or
+ *                  'group+' attribute names) ended with a plus sign, the
+ *                  specified name is resolved to a SID value, using the
+ *                  server on which the file or directory resides.  Otherwise,
+ *                  the value should be provided in SID-printable format as
+ *                  S-1-x-y-z, and is used directly.  The <sid or name>
+ *                  associated with the ACL: attribute should be provided
+ *                  similarly.
+ *
+  */
+
+static int
+Context_setxattr(Context *self, PyObject *args)
+{
+  int ret;
+  char *uri = NULL;
+  char *name = NULL;
+  char *value = NULL;
+  unsigned int flags;
+  static smbc_setxattr_fn fn;
+
+  // smbc_setxattr takes two string parameters
+  if(!PyArg_ParseTuple (args, "sssi", &uri, &name, &value, &flags)) {
+        return -1;
+  }
+  if (!value) {
+	  return -1;
+  }
+  errno = 0;
+  fn = smbc_getFunctionSetxattr(self->context);
+  ret = (*fn)(self->context, uri, name, value , strlen(value) , flags);
+
+  if(ret < 0){
+        pysmbc_SetFromErrno();
+        return -1;
+  }
+  return 0;
+}
+
+
+
 
 static PyObject *
 Context_getDebug (Context *self, void *closure)
@@ -916,6 +1000,44 @@ PyMethodDef Context_methods[] =
 "                  to names.  Without the plus sign, SIDs are not mapped;\n"
 "                  rather they are simply converted to a string format.\n"
       "@return: a string representing the actual extended attributes of the uri" },
+      
+       { "setxattr",
+      (PyCFunction) Context_setxattr, METH_VARARGS,
+      "setxattr(uri, the_acl) -> int\n\n"
+      "@type uri: string\n"
+      "@param uri: URI to modify\n"
+      "@type name: string\n"
+      "@param name: the acl to set with the following syntax\n"
+      "\n"
+      "                      system.nt_sec_desc.<attribute name>\n"
+"                     system.nt_sec_desc.*\n"
+"                     system.nt_sec_desc.*+\n"
+"                     \n"
+"                  where <attribute name> is one of:\n"
+"                  \n"
+"                     revision\n"
+"                     owner\n"
+"                     owner+\n"
+"                     group\n"
+"                     group+\n"
+"                     acl:<name or sid>\n"
+"                     acl+:<name or sid>\n"
+"                     \n"
+"                  In the forms \"system.nt_sec_desc.*\" and\n"
+"                  \"system.nt_sec_desc.*+\", the asterisk and plus signs are\n"
+"                  literal, i.e. the string is provided exactly as shown, and\n"
+"                  the value parameter will return a complete security\n"
+"                  descriptor with name:value pairs separated by tabs,\n"
+"                  commas, or newlines (not spaces!).\n"
+"\n"
+"                  The plus sign ('+') indicates that SIDs should be mapped\n"
+"                  to names.  Without the plus sign, SIDs are not mapped;\n"
+"                  rather they are simply converted to a string format.\n"
+      "@type	string\n"
+      "@param value - a string representing the acl\n"
+      "@type	int\n"
+      "@param flags - XATTR_FLAG_CREATE or XATTR_FLAG_REPLACE\n"
+      "@return: 0 on success" },
     { NULL } /* Sentinel */
   };
 #if PY_MAJOR_VERSION >= 3
