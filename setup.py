@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## Copyright (C) 2002, 2005, 2006, 2007, 2008, 2010  Red Hat, Inc
+## Copyright (C) 2002, 2005, 2006, 2007, 2008, 2010, 2011  Red Hat, Inc
 ## Copyright (C) 2010  Open Source Solution Technology Corporation
 ## Authors:
 ##  Tim Waugh <twaugh@redhat.com>
@@ -52,7 +52,7 @@ hello
 
 from distutils.core import setup, Extension
 setup (name="pysmbc",
-       version="1.0.11",
+       version="1.0.12",
        description="Python bindings for libsmbclient",
        long_description=__doc__,
        author=["Tim Waugh <twaugh@redhat.com>",
