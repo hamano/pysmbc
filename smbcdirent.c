@@ -1,6 +1,6 @@
 /* -*- Mode: C; c-file-style: "gnu" -*-
  * pysmbc - Python bindings for libsmbclient
- * Copyright (C) 2002, 2005, 2006, 2007, 2008  Tim Waugh <twaugh@redhat.com>
+ * Copyright (C) 2002, 2005, 2006, 2007, 2008, 2011  Tim Waugh <twaugh@redhat.com>
  * Copyright (C) 2010  Patrick Geltinger <patlkli@patlkli.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -112,19 +112,19 @@ Dirent_repr (PyObject *self)
 	    dent->smbc_type < (sizeof (types) / sizeof *(types)) ?
 	    types[dent->smbc_type] : "?",
 	    dent);
-  return PyUnicode_FromString (s);
+  return PyBytes_FromStringAndSize (s, strlen (s));
 }
 
 static PyObject *
 Dirent_getName (Dirent *self, void *closure)
 {
-  return PyUnicode_FromString (self->name);
+  return PyBytes_FromStringAndSize (self->name, strlen (self->name));
 }
 
 static PyObject *
 Dirent_getComment (Dirent *self, void *closure)
 {
-  return PyUnicode_FromString (self->comment);
+  return PyBytes_FromStringAndSize (self->comment, strlen (self->comment));
 }
 
 static PyObject *

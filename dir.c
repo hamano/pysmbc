@@ -1,6 +1,6 @@
 /* -*- Mode: C; c-file-style: "gnu" -*-
  * pysmbc - Python bindings for libsmbclient
- * Copyright (C) 2002, 2005, 2006, 2007, 2008  Tim Waugh <twaugh@redhat.com>
+ * Copyright (C) 2002, 2005, 2006, 2007, 2008, 2011  Tim Waugh <twaugh@redhat.com>
  * Copyright (C) 2010  Patrick Geltinger <patlkli@patlkli.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -144,13 +144,10 @@ Dir_getdents (Dir *self)
 	  PyObject *lkwlist;
 	  int len = dirp->dirlen;
 
-#if PY_MAJOR_VERSION >= 3
-	  PyObject *name = PyUnicode_FromString (dirp->name);
-	  PyObject *comment = PyUnicode_FromString (dirp->comment);
-#else
-	  PyObject *name = PyString_FromString (dirp->name);
-	  PyObject *comment = PyString_FromString (dirp->comment);
-#endif
+	  PyObject *name = PyBytes_FromStringAndSize (dirp->name,
+						      strlen (dirp->name));
+	  PyObject *comment = PyBytes_FromStringAndSize (dirp->comment,
+							 strlen(dirp->comment));
 	  PyObject *type = PyLong_FromLong (dirp->smbc_type);
 	  lkwlist = PyDict_New ();
 	  PyDict_SetItemString (lkwlist, "name", name);
