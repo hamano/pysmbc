@@ -1,6 +1,6 @@
 /* -*- Mode: C; c-file-style: "gnu" -*-
  * pysmbc - Python bindings for libsmbclient
- * Copyright (C) 2002, 2005, 2006, 2007, 2008, 2010, 2011  Red Hat, Inc
+ * Copyright (C) 2002, 2005, 2006, 2007, 2008, 2010, 2011, 2012  Red Hat, Inc
  * Copyright (C) 2010  Open Source Solution Technology Corporation
  * Copyright (C) 2010  Patrick Geltinger <patlkli@patlkli.org>
  * Authors:
@@ -144,6 +144,13 @@ Context_init (Context *self, PyObject *args, PyObject *kwds)
       return -1;
     }
 
+  smbc_setDebug (ctx, debug);
+
+  self->context = ctx;
+  smbc_setOptionUserData (ctx, self);
+  if (auth)
+    smbc_setFunctionAuthDataWithContext (ctx, auth_fn);
+
   if (smbc_init_context (ctx) == NULL)
     {
       PyErr_SetFromErrno (PyExc_RuntimeError);
@@ -151,13 +158,6 @@ Context_init (Context *self, PyObject *args, PyObject *kwds)
       debugprintf ("<- Context_init() EXCEPTION\n");
       return -1;
     }
-
-  smbc_setDebug (ctx, debug);
-
-  self->context = ctx;
-  smbc_setOptionUserData (ctx, self);
-  if (auth)
-    smbc_setFunctionAuthDataWithContext (ctx, auth_fn);
 
   debugprintf ("%p <- Context_init() = 0\n", self->context);
   return 0;
