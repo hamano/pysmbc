@@ -1,6 +1,6 @@
 /* -*- Mode: C; c-file-style: "gnu" -*-
  * pysmbc - Python bindings for libsmbclient
- * Copyright (C) 2002, 2005, 2006, 2007, 2008, 2010, 2011  Red Hat, Inc
+ * Copyright (C) 2002, 2005, 2006, 2007, 2008, 2010, 2011, 2012  Red Hat, Inc
  * Copyright (C) 2010  Open Source Solution Technology Corporation
  * Copyright (C) 2010  Patrick Geltinger <patlkli@patlkli.org>
  * Authors:
@@ -155,7 +155,7 @@ File_read (File *self, PyObject *args)
       size = st.st_size;
     }
 
-  buf = (char *) malloc(size);
+  buf = (char *)malloc (size);
   if (!buf)
     return PyErr_NoMemory ();
 
@@ -285,8 +285,8 @@ File_lseek (File *self, PyObject *args)
   offset = py_offset;
 
   /* check for data loss from cast */
-  if ((off_t_long) offset != py_offset)
-    PyErr_SetString(PyExc_OverflowError, "Data loss in casting off_t");
+  if ((off_t_long)offset != py_offset)
+    PyErr_SetString (PyExc_OverflowError, "Data loss in casting off_t");
 
   fn = smbc_getFunctionLseek (ctx->context);
   ret = (*fn) (ctx->context, self->file, offset, whence);
