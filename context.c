@@ -209,7 +209,8 @@ Context_open (Context *self, PyObject *args)
   file->file = (*fn)(self->context, uri, (int)flags, (mode_t)mode);
   if(!file->file){
 	pysmbc_SetFromErrno();
-	return NULL;
+	smbc_FileType.tp_dealloc((PyObject *)file);
+        file = NULL;
   }
   Py_DECREF (largs);
   Py_DECREF (lkwlist);
@@ -246,7 +247,8 @@ Context_creat(Context *self, PyObject *args)
   file->file = (*fn)(self->context, uri, mode);
   if(!file->file){
 	pysmbc_SetFromErrno();
-	return NULL;
+	smbc_FileType.tp_dealloc((PyObject *)file);
+        file = NULL;
   }
   Py_DECREF (largs);
   Py_DECREF (lkwlist);

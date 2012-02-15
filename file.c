@@ -101,6 +101,7 @@ File_init (File *self, PyObject *args, PyObject *kwds)
       if (file == NULL)
 	{
 	  pysmbc_SetFromErrno();
+          Py_DECREF (ctxobj);
 	  return -1;
 	}
 
