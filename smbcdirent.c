@@ -1,6 +1,6 @@
 /* -*- Mode: C; c-file-style: "gnu" -*-
  * pysmbc - Python bindings for libsmbclient
- * Copyright (C) 2002, 2005, 2006, 2007, 2008, 2011  Tim Waugh <twaugh@redhat.com>
+ * Copyright (C) 2002, 2005, 2006, 2007, 2008, 2011, 2012  Tim Waugh <twaugh@redhat.com>
  * Copyright (C) 2010  Patrick Geltinger <patlkli@patlkli.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -174,7 +174,7 @@ PyGetSetDef Dirent_getseters[] =
       0,                         /*tp_as_buffer*/
       Py_TPFLAGS_DEFAULT,        /*tp_flags*/
       "SMBC Dirent\n"
-      "=========\n\n"
+      "===========\n\n"
   
       "  A directory entry object."
       "",                        /* tp_doc */
@@ -221,7 +221,7 @@ PyGetSetDef Dirent_getseters[] =
       0,                         /*tp_as_buffer*/
       Py_TPFLAGS_DEFAULT,        /*tp_flags*/
       "SMBC Dirent\n"
-      "=========\n\n"
+      "===========\n\n"
   
       "  A directory entry object."
       "",                        /* tp_doc */
