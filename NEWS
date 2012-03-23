@@ -1,23 +1,13 @@
 NEWS
 ----
 
-New in 1.0.13:
-* Context.getxattr
-* working on Context.setxattr
-* added XATTR constants
-* smbc.XATTR
-* smbc.XATTR_ACL 
-* smbc.XATTR_ACL_SID 
-* smbc.XATTR_ALL 
-* smbc.XATTR_ALL_SID 
-* smbc.XATTR_FLAG_CREATE 
-* smbc.XATTR_FLAG_REPLACE 
-* smbc.XATTR_GROUP 
-* smbc.XATTR_GROUP_SID 
-* smbc.XATTR_OWNER 
-* smbc.XATTR_OWNER_SID 
-* smbc.XATTR_REVISION 
+New in 1.0.14:
 
+* Context.getxattr, Context.setxattr
+* smbc.XATTR, smbc.XATTR_ACL, smbc.XATTR_ACL_SID, smbc.XATTR_ALL,
+  smbc.XATTR_ALL_SID, smbc.XATTR_FLAG_CREATE, smbc.XATTR_FLAG_REPLACE,
+  smbc.XATTR_GROUP, smbc.XATTR_GROUP_SID, smbc.XATTR_OWNER,
+  smbc.XATTR_OWNER_SID, smbc.XATTR_REVISION
 
 New in 1.0.12:
 
