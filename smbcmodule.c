@@ -7,6 +7,8 @@
  *  Tim Waugh <twaugh@redhat.com>
  *  Tsukasa Hamano <hamano@osstech.co.jp>
  *  Patrick Geltinger <patlkli@patlkli.org>
+ *  Fabio Isgrò <fisgro@babel.it>
+ *  Roberto Polli <rpolli@babel.it>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,6 +45,7 @@ PyObject *TimedOutError;
 PyObject *NoSpaceError;
 
 #if PY_MAJOR_VERSION >= 3
+  #define PYSMBC_INIT_ERROR NULL
   static struct PyModuleDef smbc_module = {
     PyModuleDef_HEAD_INIT,
     "smbc",
@@ -51,39 +54,50 @@ PyObject *NoSpaceError;
     SmbcMethods
   };
 
-PyObject *
-PyInit_smbc (void)
+	#define PYSMBC_PROTOTYPE_HEADER PyObject * PyInit_smbc (void)
+	#define PYSMBC_MODULE_CREATOR PyModule_Create (&smbc_module)
 #else
-void
-initsmbc (void)
+	#define PYSMBC_INIT_ERROR
+	#define PYSMBC_PROTOTYPE_HEADER void initsmbc (void)
+	#define PYSMBC_MODULE_CREATOR Py_InitModule ("smbc", SmbcMethods)
 #endif
+
+PYSMBC_PROTOTYPE_HEADER
 {
-#if PY_MAJOR_VERSION >= 3
-    PyObject *m = PyModule_Create (&smbc_module);
-#else
-    PyObject *m = Py_InitModule ("smbc", SmbcMethods);
-#endif
+  PyObject *m = PYSMBC_MODULE_CREATOR;
+
   PyObject *d = PyModule_GetDict (m);
 
   // Context type
   if (PyType_Ready (&smbc_ContextType) < 0)
-    return;
+    return PYSMBC_INIT_ERROR;
   PyModule_AddObject (m, "Context", (PyObject *) &smbc_ContextType);
 
   // Dir type
   if (PyType_Ready (&smbc_DirType) < 0)
-    return;
+    return PYSMBC_INIT_ERROR;
   PyModule_AddObject (m, "Dir", (PyObject *) &smbc_DirType);
 
   // File type
   if (PyType_Ready (&smbc_FileType) < 0)
-    return;
+    return PYSMBC_INIT_ERROR;
   PyModule_AddObject (m, "File", (PyObject *) &smbc_FileType);
 
   // Dirent type
   if (PyType_Ready (&smbc_DirentType) < 0)
-    return;
+    return PYSMBC_INIT_ERROR;
   PyModule_AddObject (m, "Dirent", (PyObject *) &smbc_DirentType);
+
+  // ACL string constants
+  PyModule_AddStringConstant(m, "XATTR_ALL", SMBC_XATTR_ALL);
+  PyModule_AddStringConstant(m, "XATTR_ALL_SID", SMBC_XATTR_ALL_SID);
+  PyModule_AddStringConstant(m, "XATTR_GROUP", SMBC_XATTR_GROUP);
+  PyModule_AddStringConstant(m, "XATTR_GROUP_SID", SMBC_XATTR_GROUP_SID);
+  PyModule_AddStringConstant(m, "XATTR_OWNER", SMBC_XATTR_OWNER);
+  PyModule_AddStringConstant(m, "XATTR_OWNER_SID", SMBC_XATTR_OWNER_SID);
+  PyModule_AddStringConstant(m, "XATTR_ACL", SMBC_XATTR_ACL);
+  PyModule_AddStringConstant(m, "XATTR_ACL_SID", SMBC_XATTR_ACL_SID);
+  PyModule_AddStringConstant(m, "XATTR_REVISION", SMBC_XATTR_REVISION);
 
 #define INT_CONSTANT(prefix, name)			\
   do							\
@@ -102,6 +116,10 @@ initsmbc (void)
   INT_CONSTANT (SMB_CTX_, FLAG_USE_KERBEROS);
   INT_CONSTANT (SMB_CTX_, FLAG_FALLBACK_AFTER_KERBEROS);
   INT_CONSTANT (SMBCCTX_, FLAG_NO_AUTO_ANONYMOUS_LOGON);
+
+  // define constants for ACL
+  INT_CONSTANT (SMBC_, XATTR_FLAG_CREATE);
+  INT_CONSTANT (SMBC_, XATTR_FLAG_REPLACE);
 
   NoEntryError = PyErr_NewException("smbc.NoEntryError", NULL, NULL);
   Py_INCREF(NoEntryError);
