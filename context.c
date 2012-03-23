@@ -485,29 +485,33 @@ Context_chmod (Context *self, PyObject *args)
  *                     system.nt_sec_desc.*+
   */
 static PyObject *
-Context_getxattr(Context *self, PyObject *args)
+Context_getxattr (Context *self, PyObject *args)
 {
   int ret;
   char *uri = NULL;
   char *name = NULL;
   char value[1024];
-  bzero(value,1024);
   static smbc_getxattr_fn fn;
 
+  bzero(value, 1024);
+
   // smbc_getxattr takes two string parameters
-  if(!PyArg_ParseTuple (args, "ss", &uri, &name)) {
-	return NULL;
-  }
+  if (!PyArg_ParseTuple (args, "ss", &uri, &name))
+    {
+      return NULL;
+    }
 
   errno = 0;
   fn = smbc_getFunctionGetxattr(self->context);
-  ret = (*fn)(self->context, uri, name, value , 1024 );
+  ret = (*fn)(self->context, uri, name, value, 1024);
 
-  if(ret < 0){
-	pysmbc_SetFromErrno();
-	return NULL;
+  if (ret < 0)
+    {
+      pysmbc_SetFromErrno ();
+      return NULL;
   }
-  return PyUnicode_FromString(value);
+
+  return PyUnicode_FromString (value);
 }
 
 
@@ -566,7 +570,7 @@ Context_getxattr(Context *self, PyObject *args)
   */
 
 static int
-Context_setxattr(Context *self, PyObject *args)
+Context_setxattr (Context *self, PyObject *args)
 {
   int ret;
   char *uri = NULL;
@@ -576,20 +580,26 @@ Context_setxattr(Context *self, PyObject *args)
   static smbc_setxattr_fn fn;
 
   // smbc_setxattr takes two string parameters
-  if(!PyArg_ParseTuple (args, "sssi", &uri, &name, &value, &flags)) {
-        return -1;
-  }
-  if (!value) {
-	  return -1;
-  }
-  errno = 0;
-  fn = smbc_getFunctionSetxattr(self->context);
-  ret = (*fn)(self->context, uri, name, value , strlen(value) , flags);
+  if (!PyArg_ParseTuple (args, "sssi", &uri, &name, &value, &flags))
+    {
+      return -1;
+    }
 
-  if(ret < 0){
-        pysmbc_SetFromErrno();
-        return -1;
-  }
+  if (!value)
+    {
+      return -1;
+    }
+
+  errno = 0;
+  fn = smbc_getFunctionSetxattr (self->context);
+  ret = (*fn)(self->context, uri, name, value, strlen (value), flags);
+
+  if (ret < 0)
+    {
+      pysmbc_SetFromErrno ();
+      return -1;
+    }
+
   return 0;
 }
 
