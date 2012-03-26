@@ -78,6 +78,7 @@ auth_fn (SMBCCTX *ctx,
 			 &use_username,
 			 &use_password))
     {
+      Py_DECREF (result);
       debugprintf ("<- auth_fn(), incorrect callback result\n");
       return;
     }
@@ -85,6 +86,7 @@ auth_fn (SMBCCTX *ctx,
   strncpy (workgroup, use_workgroup, wgmaxlen);
   strncpy (username, use_username, unmaxlen);
   strncpy (password, use_password, pwmaxlen);
+  Py_DECREF (result);
   debugprintf ("<- auth_fn(), got callback result\n");
 }
 
