@@ -23,6 +23,9 @@ To run all the tests execute
 To run just one test, use
 # nosetests file.py
 
+To selectively run test methods, printing output to console
+# nosetests -vs  test_context.py:test_Workgroup
+
 
 NOTE: to run your tests, you need 
  * a running samba server 

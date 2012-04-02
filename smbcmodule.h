@@ -45,7 +45,7 @@ extern PyObject *TimedOutError;
 
 #define SMBC_XATTR							"system.nt_sec_desc."
 #define SMBC_XATTR_ALL 					SMBC_XATTR "*"
-#define SMBC_XATTR_ALL_SID			SMBC_XATTR "+"
+#define SMBC_XATTR_ALL_SID			SMBC_XATTR_ALL "+"
 #define SMBC_XATTR_REVISION 		SMBC_XATTR "revision"
 #define SMBC_XATTR_OWNER			SMBC_XATTR "owner"
 #define SMBC_XATTR_OWNER_SID	SMBC_XATTR_OWNER "+"
