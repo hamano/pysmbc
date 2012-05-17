@@ -121,6 +121,7 @@ PYSMBC_PROTOTYPE_HEADER
   INT_CONSTANT (SMBC_, XATTR_FLAG_CREATE);
   INT_CONSTANT (SMBC_, XATTR_FLAG_REPLACE);
 
+  // define exception objects
   NoEntryError = PyErr_NewException("smbc.NoEntryError", NULL, NULL);
   Py_INCREF(NoEntryError);
   PyModule_AddObject(m, "NoEntryError", NoEntryError);
