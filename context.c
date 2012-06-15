@@ -671,7 +671,11 @@ Context_setNetbiosName (Context *self, PyObject *value, void *closure)
       return -1;
     }
 
+#if PY_MAJOR_VERSION < 3
   if (PyUnicode_AsWideChar ((PyUnicodeObject *) value, w_name, chars) == -1)
+#else
+  if (PyUnicode_AsWideChar (value, w_name, chars) == -1)
+#endif
     {
       free (w_name);
       return -1;
@@ -736,8 +740,12 @@ Context_setWorkgroup (Context *self, PyObject *value, void *closure)
       return -1;
     }
 
+#if PY_MAJOR_VERSION < 3
   if (PyUnicode_AsWideChar ((PyUnicodeObject *) value,
 			    w_workgroup, chars) == -1)
+#else
+  if (PyUnicode_AsWideChar (value, w_workgroup, chars) == -1)
+#endif
     {
       free (w_workgroup);
       return -1;
@@ -777,13 +785,21 @@ Context_getTimeout (Context *self, void *closure)
 static int
 Context_setTimeout (Context *self, PyObject *value, void *closure)
 {
+#if PY_MAJOR_VERSION < 3
+  if (!PyInt_Check (value))
+#else
   if (!PyLong_Check (value))
+#endif
     {
       PyErr_SetString (PyExc_TypeError, "must be long");
       return -1;
     }
 
+#if PY_MAJOR_VERSION < 3
+  smbc_setTimeout (self->context, PyInt_AsLong (value));
+#else
   smbc_setTimeout (self->context, PyLong_AsLong (value));
+#endif
   return 0;
 }
 
