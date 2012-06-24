@@ -18,9 +18,9 @@ def test_AuthSuccess():
     uri = 'smb://' + settings.SERVER + '/' + settings.SHARE
     try:
         dir = ctx.opendir(uri)
-	print "ok: connection to ", uri
+        print("ok: connection to ", uri)
     except:
-	print "fail: connection to ", uri
+        print("fail: connection to ", uri)
         assert False
 
 def test_AuthFailNoauth():
@@ -30,13 +30,13 @@ def test_AuthFailNoauth():
     try:
         dir = ctx.opendir(uri)
     except smbc.PermissionError:
-        print "ok: permission error to ", uri
+        print("ok: permission error to ", uri)
         pass
     except:
-	print "fail: error connecting to", uri
+        print("fail: error connecting to", uri)
         assert False
     else:
-	print "fail: error connecting to", uri
+        print("fail: error connecting to", uri)
         assert False
 
 def test_AuthFailNopass():
