@@ -24,6 +24,8 @@ smbcType = {
     smbc.IPC_SHARE : 'IPC_SHARE'
 }
 
+# another map for system errors TODO can you find them in another module?
+EINVAL = 22
 
 def setUp():
     global ctx
@@ -83,32 +85,93 @@ def test_xattr_get():
         assert(ctx.getxattr(furl, xattr))
     ctx.open(furl)
 
-def test_xattr_put():
-    raise SkipTest("xattr_put to be implemented")
+def test_xattr_get_error():
+    """ Verify that a RuntimeError is raised when passing bad arguments to getxattr()
+
+         Bad arguments include malformed xattrs and unexistent file
+    """
+    print "test_xattr"
+    furl = touch_file("tmpfile.out")
+
+    # create all combinations of attribute strings
+    plus_xattrs = ["%s%s" % (i,j) for i in ["owner", "pluto", "*"] for j in ["x","-"]]
+    plus_xattrs.append("revisionX")
+    invalid_xatts = ["system.nt_sec_desc." +i for i in  plus_xattrs]
+
+    try:
+        ctx.getxattr("UNEXISTENT", smbc.XATTR_OWNER)
+        assert False, "getxattr should fail with an unexistent file"
+    except RuntimeError as e: 
+        (errno,strerror) = e.args 
+        assert errno == EINVAL # TODO is it possible to trap an unexistent entity error from smbclient?
+        pass
+
+    # check their existence
+    for xattr in invalid_xatts:
+        print "\ttesting %s with %s" % (furl, xattr)
+        try:
+            ctx.getxattr(furl, xattr)
+            assert False, "getxattr should fail with %s" % xattr
+        except RuntimeError as e:
+            (errno,strerror) = e.args 
+            assert errno == EINVAL # invalid arguments
+
+    ctx.open(furl)
+
+def test_xattr_set():
+    #raise SkipTest("xattr_set to be implemented")
     print "test_xattr_put"
     furl = touch_file("tmpfile_set.out")
-    attrs = ctx.getxattr(furl, smbc.XATTR_ALL_SID)
-    print "attrs(%s): %s" % (smbc.XATTR_ALL_SID,  attrs)
-    ctx.setxattr(furl, smbc.XATTR_ALL_SID, attrs, smbc.XATTR_FLAG_REPLACE)
+    attr_name = smbc.XATTR_ALL
+    attrs = ctx.getxattr(furl, attr_name)
+    print "attrs(%s): %s" % (attr_name,  attrs)
+    ctx.setxattr(furl, attr_name, attrs, smbc.XATTR_FLAG_REPLACE)
+    attrs1 = ctx.getxattr(furl, attr_name)
+    print "attrs1(%s): %s" % (attr_name,  attrs1)
+
+def test_xattr_set_error():
+    #raise SkipTest("xattr_set to be implemented")
+    print "test_xattr_set_error"
+    furl = touch_file("tmpfile_set.out")
+    attr_name = smbc.XATTR_ALL_SID
+    attrs_ok = ctx.getxattr(furl, attr_name)
+    attrs = "BAD_VALUE" # causes segfault
+    try:
+        ctx.setxattr(furl, attr_name, attrs, smbc.XATTR_FLAG_REPLACE)
+    except RuntimeError as e:
+        (errno,strerror) = e.args 
+        assert errno == EINVAL # invalid arguments
+
+    try:
+        attrs_1 = u'REVISION:1,OWNER:RPOLLI\\babel,GROUP:Unix Group\\babel,ACL:RPOLLI\\babel:0/0/0x001e01ff,ACL:Unix Group\\babel:0/0/0x00120089,ACL:\\Everyone:0/0/0x00120089'
+        ctx.setxattr(furl, attr_name, attrs_1, smbc.XATTR_FLAG_REPLACE)
+        attrs1 = ctx.getxattr(furl, attr_name)
+    except RuntimeError as e:
+        (errno,strerror) = e.args 
+        assert errno == EINVAL # invalid arguments
+        raise e
+
+    print "attrs1(%s): %s" % (attr_name,  attrs1)
+    
     
 def test_Workgroup():
-    list = ctx.opendir('smb://').getdents()
-    assert(len(list) > 0)
-    for entry in list:
-        assert(entry.smbc_type == smbc.WORKGROUP), "Entry %s of type %s, expected %d" % (entry.name, smbcType[entry.smbc_type], smbc.WORKGROUP)
+    l_entries = ctx.opendir('smb://').getdents()
+    assert(len(l_entries) > 0)
+    for entry in l_entries:
+        assert(entry.smbc_type == smbc.WORKGROUP), "Entry %s of type %s, expected %s" % (entry.name, smbcType[entry.smbc_type], smbcType[smbc.WORKGROUP])
 
 def test_Server():
     uri = 'smb://' + settings.WORKGROUP 
-    list = ctx.opendir(uri).getdents()
-    assert(len(list) > 0)
-    for entry in list:
-        assert(entry.smbc_type == smbc.SERVER), "Entry %s of type %s, expected %d" % (entry.name, smbcType[entry.smbc_type], smbc.SERVER)
+    l_entries = ctx.opendir(uri).getdents()
+    assert(len(l_entries) > 0)
+    for entry in l_entries:
+        assert(entry.smbc_type == smbc.SERVER), "Entry %s of type %s, expected %s" % (entry.name, smbcType[entry.smbc_type], smbcType[smbc.SERVER])
 
 def test_Share():
     uri = 'smb://' + settings.SERVER
-    list = ctx.opendir(uri).getdents()
+    l_entries = ctx.opendir(uri).getdents()
 
     allowed_shares = [smbc.FILE_SHARE, smbc.PRINTER_SHARE, smbc.IPC_SHARE, smbc.COMMS_SHARE]
-    assert(len(list) > 0)
-    for entry in list:
+    assert(len(l_entries) > 0)
+    for entry in l_entries:
         assert (entry.smbc_type in allowed_shares), "Entry was %s (%d), expected values: %s" % (smbcType[entry.smbc_type], entry.smbc_type, allowed_shares) 
