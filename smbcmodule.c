@@ -177,6 +177,9 @@ void pysmbc_SetFromErrno()
   case ENOSPC:
 	PyErr_SetFromErrno(NoSpaceError);
 	break;
+  case EINVAL:
+	PyErr_SetFromErrno(PyExc_ValueError);
+	break;
   default:
 	PyErr_SetFromErrno(PyExc_RuntimeError);
   }
