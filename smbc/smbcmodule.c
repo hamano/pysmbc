@@ -48,7 +48,7 @@ PyObject *NoSpaceError;
   #define PYSMBC_INIT_ERROR NULL
   static struct PyModuleDef smbc_module = {
     PyModuleDef_HEAD_INIT,
-    "smbc",
+    "_smbc",
     NULL,
     -1,
     SmbcMethods
@@ -58,8 +58,8 @@ PyObject *NoSpaceError;
 	#define PYSMBC_MODULE_CREATOR PyModule_Create (&smbc_module)
 #else
 	#define PYSMBC_INIT_ERROR
-	#define PYSMBC_PROTOTYPE_HEADER void initsmbc (void)
-	#define PYSMBC_MODULE_CREATOR Py_InitModule ("smbc", SmbcMethods)
+	#define PYSMBC_PROTOTYPE_HEADER void init_smbc (void)
+	#define PYSMBC_MODULE_CREATOR Py_InitModule ("_smbc", SmbcMethods)
 #endif
 
 PYSMBC_PROTOTYPE_HEADER
@@ -177,6 +177,9 @@ void pysmbc_SetFromErrno()
 	break;
   case ENOSPC:
 	PyErr_SetFromErrno(NoSpaceError);
+	break;
+  case EINVAL:
+	PyErr_SetFromErrno(PyExc_ValueError);
 	break;
   default:
 	PyErr_SetFromErrno(PyExc_RuntimeError);

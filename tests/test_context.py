@@ -101,7 +101,7 @@ def test_xattr_get_error():
     try:
         ctx.getxattr("UNEXISTENT", smbc.XATTR_OWNER)
         assert False, "getxattr should fail with an unexistent file"
-    except RuntimeError as e: 
+    except ValueError as e: 
         (errno,strerror) = e.args 
         assert errno == EINVAL # TODO is it possible to trap an unexistent entity error from smbclient?
         pass
@@ -112,7 +112,7 @@ def test_xattr_get_error():
         try:
             ctx.getxattr(furl, xattr)
             assert False, "getxattr should fail with %s" % xattr
-        except RuntimeError as e:
+        except ValueError as e:
             (errno,strerror) = e.args 
             assert errno == EINVAL # invalid arguments
 
@@ -128,6 +128,28 @@ def test_xattr_set():
     ctx.setxattr(furl, attr_name, attrs, smbc.XATTR_FLAG_REPLACE)
     attrs1 = ctx.getxattr(furl, attr_name)
     print "attrs1(%s): %s" % (attr_name,  attrs1)
+    assert attrs1 == attrs
+
+@SkipTest
+def test_xattr_set_2():
+    furl = touch_file("tmpfile_set.out")
+    attrs_new = u'REVISION:1,OWNER:RPOLLI\\babel" \
+        + ",GROUP:Unix Group\\babel" \
+        + ",ACL:RPOLLI\\babel:0/0/0x001e01ff" \
+        + ",ACL:Unix Group\\babel:0/0/0x00120089" \
+        + ",ACL:Unix Group\\games:0/0/0x001e01ff" \
+        + ",ACL:\\Everyone:0/0/0x00120089'
+    attr_name = smbc.XATTR_ALL_SID
+    attrs_0 = ctx.getxattr(furl, attr_name)
+    print "original attrs(%s)" % attrs_0
+
+    assert attrs_0 != attrs_new, "Old and new attributes are the same:\n%s\n%s\n" % (attrs_0, attrs_new)
+
+    ctx.setxattr(furl, attr_name, attrs_new, smbc.XATTR_FLAG_REPLACE)
+    attrs_1 = ctx.getxattr(furl, attr_name)
+
+    print "attrs_1(%s): %s" % (attr_name,  attrs_1)
+    assert attrs_1 == attrs_new
 
 def test_xattr_set_error():
     #raise SkipTest("xattr_set to be implemented")
@@ -136,22 +158,18 @@ def test_xattr_set_error():
     attr_name = smbc.XATTR_ALL_SID
     attrs_ok = ctx.getxattr(furl, attr_name)
     attrs = "BAD_VALUE" # causes segfault
-    try:
-        ctx.setxattr(furl, attr_name, attrs, smbc.XATTR_FLAG_REPLACE)
-    except RuntimeError as e:
-        (errno,strerror) = e.args 
-        assert errno == EINVAL # invalid arguments
-
-    try:
-        attrs_1 = u'REVISION:1,OWNER:RPOLLI\\babel,GROUP:Unix Group\\babel,ACL:RPOLLI\\babel:0/0/0x001e01ff,ACL:Unix Group\\babel:0/0/0x00120089,ACL:\\Everyone:0/0/0x00120089'
-        ctx.setxattr(furl, attr_name, attrs_1, smbc.XATTR_FLAG_REPLACE)
-        attrs1 = ctx.getxattr(furl, attr_name)
-    except RuntimeError as e:
-        (errno,strerror) = e.args 
-        assert errno == EINVAL # invalid arguments
-        raise e
-
-    print "attrs1(%s): %s" % (attr_name,  attrs1)
+    for xa in ["BAD_VALUE", u'REVISION:1,OWNER:RPOLLI\\babel,GROUP:', 0, None]: 
+        try:
+            ctx.setxattr(furl, attr_name, xa, smbc.XATTR_FLAG_REPLACE)
+        except ValueError as e:
+            (errno,strerror) = e.args 
+            assert errno == EINVAL # invalid arguments
+            print "setxattr(%s) raises  %s" % (xa, e)
+            pass
+        except TypeError as e:
+            print "setxattr(%s) raises  %s" % (xa, e)
+            pass 
+    
     
     
 def test_Workgroup():

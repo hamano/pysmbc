@@ -2,11 +2,11 @@ NAME=pysmbc
 VERSION:=$(shell python setup.py --version)
 SDIST_ARGS=--formats=bztar -d.
 
-smbc.so: force
+_smbc.so: force
 	python setup.py build
 	mv build/lib*/$@ .
 
-doc: smbc.so
+doc: _smbc.so
 	rm -rf html
 	epydoc -o html --html $<
 
@@ -14,7 +14,7 @@ doczip:	doc
 	cd html && zip ../smbc-html.zip *
 
 clean:
-	-rm -rf build smbc.so *.pyc tests/*.pyc *~ tests/*~
+	-rm -rf build smbc.so *.pyc tests/*.pyc *~ tests/*~ _smbc.so 
 
 dist:
 	python setup.py sdist $(SDIST_ARGS)
