@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-## Copyright (C) 2002, 2005, 2006, 2007, 2008, 2010, 2011  Red Hat, Inc
+## Copyright (C) 2002, 2005, 2006, 2007, 2008, 2010, 2011, 2012  Red Hat, Inc
 ## Copyright (C) 2010  Open Source Solution Technology Corporation
 ## Authors:
 ##  Tim Waugh <twaugh@redhat.com>
@@ -51,6 +51,15 @@ hello
 """
 
 from distutils.core import setup, Extension
+import commands
+
+def pkgconfig_I (pkg):
+    dirs = []
+    for p in commands.getoutput ("pkg-config --cflags %s" % pkg).split ():
+        if p.startswith ("-I"):
+            dirs.append (p[2:])
+    return dirs
+    
 setup (name="pysmbc",
        version="1.0.13",
        description="Python bindings for libsmbclient",
@@ -76,4 +85,5 @@ setup (name="pysmbc",
                                "smbc/dir.c",
                                "smbc/file.c",
                                "smbc/smbcdirent.c"],
-                              libraries=["smbclient"])])
+                              libraries=["smbclient"],
+                              include_dirs=pkgconfig_I("smbclient"))])
