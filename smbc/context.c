@@ -7,6 +7,8 @@
  *  Tim Waugh <twaugh@redhat.com>
  *  Tsukasa Hamano <hamano@osstech.co.jp>
  *  Patrick Geltinger <patlkli@patlkli.org>
+ *  Roberto Polli <rpolli@babel.it>
+ *  Fabio Isgro' <fisgro@babel.it>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -568,10 +570,22 @@ Context_getxattr (Context *self, PyObject *args)
  *                  S-1-x-y-z, and is used directly.  The <sid or name>
  *                  associated with the ACL: attribute should be provided
  *                  similarly.
+ * @return          0 on success, < 0 on error with errno set:
+ *                  - EINVAL  The client library is not properly initialized
+ *                            or one of the parameters is not of a correct
+ *                            form
+ *                  - ENOMEM No memory was available for internal needs
+ *                  - EEXIST  If the attribute already exists and the flag
+ *                            SMBC_XATTR_FLAG_CREAT was specified
+ *                  - ENOATTR If the attribute does not exist and the flag
+ *                            SMBC_XATTR_FLAG_REPLACE was specified
+ *                  - EPERM   Permission was denied.
+ *                  - ENOTSUP The referenced file system does not support
+ *                            extended attributes
  *
   */
 
-static int
+static PyObject*
 Context_setxattr (Context *self, PyObject *args)
 {
   int ret;
@@ -581,28 +595,30 @@ Context_setxattr (Context *self, PyObject *args)
   unsigned int flags;
   static smbc_setxattr_fn fn;
 
+
   // smbc_setxattr takes two string parameters
   if (!PyArg_ParseTuple (args, "sssi", &uri, &name, &value, &flags))
     {
-      return -1;
+      return NULL;
     }
 
   if (!value)
     {
-      return -1;
+      return NULL;
     }
 
   errno = 0;
   fn = smbc_getFunctionSetxattr (self->context);
+
   ret = (*fn)(self->context, uri, name, value, strlen (value), flags);
 
   if (ret < 0)
     {
       pysmbc_SetFromErrno ();
-      return -1;
+      return NULL;
     }
 
-  return 0;
+  return PyLong_FromLong (ret);
 }
 
 
