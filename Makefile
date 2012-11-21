@@ -4,7 +4,7 @@ SDIST_ARGS=--formats=bztar -d.
 
 _smbc.so: force
 	python setup.py build
-	mv build/lib*/$@ .
+	mv build/lib*/_smbc*.so .
 
 doc: _smbc.so
 	rm -rf html
@@ -14,7 +14,7 @@ doczip:	doc
 	cd html && zip ../smbc-html.zip *
 
 clean:
-	-rm -rf build smbc.so *.pyc tests/*.pyc *~ tests/*~ _smbc.so 
+	-rm -rf build smbc.so *.pyc tests/*.pyc *~ tests/*~ _smbc*.so 
 
 dist:
 	python setup.py sdist $(SDIST_ARGS)

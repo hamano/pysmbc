@@ -51,11 +51,14 @@ hello
 """
 
 from distutils.core import setup, Extension
-import commands
+import subprocess
 
 def pkgconfig_I (pkg):
     dirs = []
-    for p in commands.getoutput ("pkg-config --cflags %s" % pkg).split ():
+    c = subprocess.Popen (["pkg-config", "--cflags", pkg],
+                          stdout=subprocess.PIPE)
+    (stdout, stderr) = c.communicate ()
+    for p in stdout.decode (encoding='ascii').split ():
         if p.startswith ("-I"):
             dirs.append (p[2:])
     return dirs
