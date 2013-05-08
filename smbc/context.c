@@ -510,7 +510,7 @@ Context_chmod (Context *self, PyObject *args)
  *                     system.nt_sec_desc.<attribute name>
  *                     system.nt_sec_desc.*
  *                     system.nt_sec_desc.*+
-  */
+ */
 static PyObject *
 Context_getxattr (Context *self, PyObject *args)
 {
@@ -520,7 +520,7 @@ Context_getxattr (Context *self, PyObject *args)
   char value[1024];
   static smbc_getxattr_fn fn;
 
-  bzero(value, 1024);
+  bzero(value, sizeof (value));
 
   // smbc_getxattr takes two string parameters
   if (!PyArg_ParseTuple (args, "ss", &uri, &name))
@@ -530,7 +530,7 @@ Context_getxattr (Context *self, PyObject *args)
 
   errno = 0;
   fn = smbc_getFunctionGetxattr(self->context);
-  ret = (*fn)(self->context, uri, name, value, 1024);
+  ret = (*fn)(self->context, uri, name, value, sizeof (value));
 
   if (ret < 0)
     {
@@ -619,7 +619,6 @@ Context_setxattr (Context *self, PyObject *args)
   static smbc_setxattr_fn fn;
 
 
-  // smbc_setxattr takes two string parameters
   if (!PyArg_ParseTuple (args, "sssi", &uri, &name, &value, &flags))
     {
       return NULL;
