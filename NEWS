@@ -3,6 +3,7 @@ NEWS
 
 New in 1.0.14:
 
+* Context.set_credentials_with_fallback()
 * Context.getxattr, Context.setxattr
 * smbc.XATTR, smbc.XATTR_ACL, smbc.XATTR_ACL_SID, smbc.XATTR_ALL,
   smbc.XATTR_ALL_SID, smbc.XATTR_FLAG_CREATE, smbc.XATTR_FLAG_REPLACE,

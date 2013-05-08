@@ -1,6 +1,6 @@
 /* -*- Mode: C; c-file-style: "gnu" -*-
  * pysmbc - Python bindings for libsmbclient
- * Copyright (C) 2002, 2005, 2006, 2007, 2008, 2010, 2011, 2012  Red Hat, Inc
+ * Copyright (C) 2002, 2005, 2006, 2007, 2008, 2010, 2011, 2012, 2013  Red Hat, Inc
  * Copyright (C) 2010  Open Source Solution Technology Corporation
  * Copyright (C) 2010  Patrick Geltinger <patlkli@patlkli.org>
  * Authors:
@@ -178,6 +178,29 @@ Context_dealloc (Context *self)
     }
 
   Py_TYPE(self)->tp_free ((PyObject *) self);
+}
+
+static PyObject *
+Context_set_credentials_with_fallback (Context *self, PyObject *args)
+{
+  char *workgroup = NULL;
+  char *user = NULL;
+  char *password = NULL;
+  debugprintf ("%p -> Context_set_credentials_with_fallback()\n",
+	       self->context);
+  if (!PyArg_ParseTuple (args, "sss", &workgroup, &user, &password))
+    {
+      debugprintf ("%p <- Context_open() EXCEPTION\n", self->context);
+      return NULL;
+    }
+
+  smbc_set_credentials_with_fallback (self->context,
+				      workgroup,
+				      user,
+				      password);
+  debugprintf ("%p <- Context_set_credentials_with_fallback()\n",
+	       self->context);
+  Py_RETURN_NONE;
 }
 
 static PyObject *
@@ -983,6 +1006,16 @@ PyGetSetDef Context_getseters[] =
 
 PyMethodDef Context_methods[] =
   {
+    { "set_credentials_with_fallback",
+      (PyCFunction) Context_set_credentials_with_fallback, METH_VARARGS,
+      "set_credentials_with_fallback(workgroup, user, password)\n\n"
+      "@type workgroup: string\n"
+      "@param workgroup: Workgroup of user\n"
+      "@type user: string\n"
+      "@param user: Username of user\n"
+      "@type password: string\n"
+      "@param password: Password of user\n" },
+
     { "opendir",
       (PyCFunction) Context_opendir, METH_VARARGS,
       "opendir(uri) -> Dir\n\n"
