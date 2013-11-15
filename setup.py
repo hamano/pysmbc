@@ -50,7 +50,26 @@ hello
 
 """
 
+import os
+import traceback
+import subprocess
 from distutils.core import setup, Extension
+
+
+def setup_libsmbclient():
+    try:
+        cflags = [subprocess.check_output([
+            "pkg-config", "--cflags", "smbclient"])]
+    except:
+        traceback.print_exc()
+    else:
+        os_cflags = os.getenv("CFLAGS")
+        if os_cflags:
+            cflags.append(os_cflags)
+        os.environ["CFLAGS"] = " ".join(cflags)
+
+setup_libsmbclient()
+
 setup (name="pysmbc",
        version="1.0.13",
        description="Python bindings for libsmbclient",
