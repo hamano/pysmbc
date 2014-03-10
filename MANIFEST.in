@@ -5,9 +5,9 @@ include NEWS
 include README
 include TODO
 include tests/*.py
-include context.h
-include dir.h
-include file.h
-include smbcdirent.h
-include smbcmodule.h
+include smbc/context.h
+include smbc/dir.h
+include smbc/file.h
+include smbc/smbcdirent.h
+include smbc/smbcmodule.h
 include test.py
