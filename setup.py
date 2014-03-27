@@ -64,7 +64,7 @@ def pkgconfig_I (pkg):
     return dirs
     
 setup (name="pysmbc",
-       version="1.0.14",
+       version="1.0.14.1",
        description="Python bindings for libsmbclient",
        long_description=__doc__,
        author=["Tim Waugh <twaugh@redhat.com>",

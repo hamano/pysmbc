@@ -1,6 +1,10 @@
 NEWS
 ----
 
+New in 1.0.14.1:
+
+* Fix for Python 2.6
+
 New in 1.0.14:
 
 * Context.set_credentials_with_fallback()
