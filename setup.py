@@ -58,7 +58,7 @@ def pkgconfig_I (pkg):
     c = subprocess.Popen (["pkg-config", "--cflags", pkg],
                           stdout=subprocess.PIPE)
     (stdout, stderr) = c.communicate ()
-    for p in stdout.decode ().split ():
+    for p in stdout.decode (encoding='ascii').split ():
         if p.startswith ("-I"):
             dirs.append (p[2:])
     return dirs
