@@ -43,6 +43,7 @@ PyObject *ExistsError;
 PyObject *NotEmptyError;
 PyObject *TimedOutError;
 PyObject *NoSpaceError;
+PyObject *NotDirectoryError;
 
 #if PY_MAJOR_VERSION >= 3
   #define PYSMBC_INIT_ERROR NULL
@@ -146,6 +147,10 @@ PYSMBC_PROTOTYPE_HEADER
   Py_INCREF(NoSpaceError);
   PyModule_AddObject(m, "NoSpaceError", NoSpaceError);
 
+  NotDirectoryError = PyErr_NewException("smbc.NotDirectoryError", NULL, NULL);
+  Py_INCREF(NotDirectoryError);
+  PyModule_AddObject(m, "NotDirectoryError", NotDirectoryError);
+
 #if PY_MAJOR_VERSION >= 3
   return m;
 #endif
@@ -181,6 +186,9 @@ void pysmbc_SetFromErrno()
   case EINVAL:
 	PyErr_SetFromErrno(PyExc_ValueError);
 	break;
+  case ENOTDIR:
+    PyErr_SetFromErrno(NotDirectoryError);
+    break;
   default:
 	PyErr_SetFromErrno(PyExc_RuntimeError);
   }
