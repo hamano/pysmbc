@@ -55,7 +55,9 @@ static int
 Dirent_init (Dirent *self, PyObject *args, PyObject *kwds)
 {
   const char *name;
+  int name_len;
   const char *comment;
+  int comment_len;
   unsigned int smbc_type;
   static char *kwlist[] =
     {
@@ -64,17 +66,16 @@ Dirent_init (Dirent *self, PyObject *args, PyObject *kwds)
       "smbc_type",
       NULL
     };
-
   debugprintf ("%p -> Dirent_init ()\n", self);
-  if (!PyArg_ParseTupleAndKeywords (args, kwds, "ssi", kwlist,
-				    &name, &comment, &smbc_type))
-    {
-      debugprintf ("<- Dirent_init() EXCEPTION\n");
-      return -1;
-    }
-
-  self->name = strdup (name);
-  self->comment = strdup (comment);
+  if (!PyArg_ParseTupleAndKeywords (args, kwds, "s#s#i", kwlist,
+                                    &name, &name_len,
+                                    &comment, &comment_len,
+                                    &smbc_type)) {
+    debugprintf ("<- Dirent_init() EXCEPTION\n");
+    return -1;
+  }
+  self->name = strndup (name, name_len);
+  self->comment = strndup (comment, comment_len);
   self->smbc_type = smbc_type;
   debugprintf ("%p <- Dirent_init()\n", self);
   return 0;
@@ -106,6 +107,13 @@ Dirent_repr (PyObject *self)
     };
 
   Dirent *dent = (Dirent *) self;
+#if PY_MAJOR_VERSION >= 3
+  return PyUnicode_FromFormat(
+    "<smbc.Dirent object \"%s\" (%s) at %p>", dent->name,
+    dent->smbc_type < (sizeof (types) / sizeof *(types)) ?
+    types[dent->smbc_type] : "?",
+    dent);
+#else
   char s[1024];
   snprintf (s, sizeof (s),
 	    "<smbc.Dirent object \"%s\" (%s) at %p>", dent->name,
@@ -113,6 +121,7 @@ Dirent_repr (PyObject *self)
 	    types[dent->smbc_type] : "?",
 	    dent);
   return PyBytes_FromStringAndSize (s, strlen (s));
+#endif
 }
 
 static PyObject *

@@ -139,16 +139,17 @@ Dir_getdents (Dir *self)
       dirp = (struct smbc_dirent *) dirbuf;
       while (dirlen > 0)
 	{
-	  PyObject *dent;
-	  PyObject *largs = Py_BuildValue ("()");
-	  PyObject *lkwlist;
-	  int len = dirp->dirlen;
+      PyObject *dent;
+      PyObject *largs = Py_BuildValue ("()");
+      PyObject *lkwlist;
+      int len = dirp->dirlen;
+      int ret;
 
-	  PyObject *name = PyBytes_FromStringAndSize (dirp->name,
-						      strlen (dirp->name));
-	  PyObject *comment = PyBytes_FromStringAndSize (dirp->comment,
-							 strlen(dirp->comment));
-	  PyObject *type = PyLong_FromLong (dirp->smbc_type);
+      PyObject *name = PyBytes_FromStringAndSize (dirp->name,
+                                                  strlen (dirp->name));
+      PyObject *comment = PyBytes_FromStringAndSize (dirp->comment,
+                                                     strlen(dirp->comment));
+      PyObject *type = PyLong_FromLong (dirp->smbc_type);
 	  lkwlist = PyDict_New ();
 	  PyDict_SetItemString (lkwlist, "name", name);
 	  PyDict_SetItemString (lkwlist, "comment", comment);
@@ -157,10 +158,16 @@ Dir_getdents (Dir *self)
 	  Py_DECREF (comment);
 	  Py_DECREF (type);
 	  dent = smbc_DirentType.tp_new (&smbc_DirentType, largs, lkwlist);
-	  smbc_DirentType.tp_init (dent, largs, lkwlist);
-	  debugprintf ("%p\n", dent);
+	  ret = smbc_DirentType.tp_init (dent, largs, lkwlist);
 	  Py_DECREF (largs);
 	  Py_DECREF (lkwlist);
+      if(ret < 0){
+        PyErr_SetString (PyExc_RuntimeError,
+                         "Cannot initialize smbc_DirentType");
+        Py_DECREF (listobj);
+        Py_DECREF (dent);
+        return NULL;
+      }
 
 	  PyList_Append (listobj, dent);
 	  Py_DECREF (dent);
