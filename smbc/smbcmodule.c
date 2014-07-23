@@ -55,7 +55,7 @@ PyObject *NotDirectoryError;
     SmbcMethods
   };
 
-	#define PYSMBC_PROTOTYPE_HEADER PyObject * PyInit_smbc (void)
+	#define PYSMBC_PROTOTYPE_HEADER PyObject * PyInit__smbc (void)
 	#define PYSMBC_MODULE_CREATOR PyModule_Create (&smbc_module)
 #else
 	#define PYSMBC_INIT_ERROR
