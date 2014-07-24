@@ -127,13 +127,13 @@ Dirent_repr (PyObject *self)
 static PyObject *
 Dirent_getName (Dirent *self, void *closure)
 {
-  return PyBytes_FromStringAndSize (self->name, strlen (self->name));
+  return PyUnicode_FromFormat("%s", self->name);
 }
 
 static PyObject *
 Dirent_getComment (Dirent *self, void *closure)
 {
-  return PyBytes_FromStringAndSize (self->comment, strlen (self->comment));
+  return PyUnicode_FromFormat("%s", self->comment);
 }
 
 static PyObject *

@@ -1,6 +1,9 @@
 NEWS
 ----
 
+New in 1.0.15.1:
+* Return direntry with unicode string
+
 New in 1.0.15:
 * Working with Python3
 
