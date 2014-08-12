@@ -44,6 +44,7 @@ PyObject *NotEmptyError;
 PyObject *TimedOutError;
 PyObject *NoSpaceError;
 PyObject *NotDirectoryError;
+PyObject *ConnectionRefusedError;
 
 #if PY_MAJOR_VERSION >= 3
   #define PYSMBC_INIT_ERROR NULL
@@ -151,6 +152,10 @@ PYSMBC_PROTOTYPE_HEADER
   Py_INCREF(NotDirectoryError);
   PyModule_AddObject(m, "NotDirectoryError", NotDirectoryError);
 
+  NotDirectoryError = PyErr_NewException("smbc.ConnectionRefusedError", NULL, NULL);
+  Py_INCREF(ConnectionRefusedError);
+  PyModule_AddObject(m, "ConnectionRefusedError", ConnectionRefusedError);
+
 #if PY_MAJOR_VERSION >= 3
   return m;
 #endif
@@ -188,6 +193,9 @@ void pysmbc_SetFromErrno()
 	break;
   case ENOTDIR:
     PyErr_SetFromErrno(NotDirectoryError);
+    break;
+  case ECONNREFUSED:
+    PyErr_SetFromErrno(ConnectionRefusedError);
     break;
   default:
 	PyErr_SetFromErrno(PyExc_RuntimeError);

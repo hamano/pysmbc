@@ -1,6 +1,9 @@
 NEWS
 ----
 
+New in 1.0.15.2:
+* added smbc.ConnectionRefusedError
+
 New in 1.0.15.1:
 * Return direntry with unicode string
 
