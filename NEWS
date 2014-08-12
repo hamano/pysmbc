@@ -1,7 +1,7 @@
 NEWS
 ----
 
-New in 1.0.15.2:
+New in 1.0.15.3:
 * added smbc.ConnectionRefusedError
 
 New in 1.0.15.1:

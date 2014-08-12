@@ -152,7 +152,7 @@ PYSMBC_PROTOTYPE_HEADER
   Py_INCREF(NotDirectoryError);
   PyModule_AddObject(m, "NotDirectoryError", NotDirectoryError);
 
-  NotDirectoryError = PyErr_NewException("smbc.ConnectionRefusedError", NULL, NULL);
+  ConnectionRefusedError = PyErr_NewException("smbc.ConnectionRefusedError", NULL, NULL);
   Py_INCREF(ConnectionRefusedError);
   PyModule_AddObject(m, "ConnectionRefusedError", ConnectionRefusedError);
 
