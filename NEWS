@@ -1,6 +1,9 @@
 NEWS
 ----
 
+New in 1.0.15.4:
+* added some constants
+
 New in 1.0.15.3:
 * added smbc.ConnectionRefusedError
 
