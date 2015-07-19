@@ -14,3 +14,4 @@ install:
   - pip install .
 
 script:
+ - echo "no test"
