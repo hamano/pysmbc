@@ -7,4 +7,6 @@ python:
 sudo: required
 
 install:
-  - echo "install"
+  - pip install .
+
+script:
