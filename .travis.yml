@@ -11,8 +11,7 @@ before_install:
   - sudo apt-get install -qq libsmbclient-dev
 
 install:
-  - python setup.py build
-#  - pip install .
+  - pip install .
 
 script:
- - echo "no test"
+ - echo "can't test on Travis CI"
