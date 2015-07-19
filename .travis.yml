@@ -6,4 +6,5 @@ python:
 
 sudo: required
 
-#install:
+install:
+  - echo "install"
