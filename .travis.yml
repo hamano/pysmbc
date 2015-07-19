@@ -11,7 +11,8 @@ before_install:
   - sudo apt-get install -qq libsmbclient-dev
 
 install:
-  - pip install .
+  - python setup.py build
+#  - pip install .
 
 script:
  - echo "no test"
