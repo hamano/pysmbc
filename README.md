@@ -1,7 +1,7 @@
 SMB bindings for Python
 -----------------------
 
-[![PyPI](https://img.shields.io/pypi/v/pysmbc.svg)]()
+[![PyPI](https://img.shields.io/pypi/v/pysmbc.svg)](https://pypi.python.org/pypi/pysmbc/)
 [![Travis](https://img.shields.io/travis/hamano/pysmbc.svg)]()
 [![GitHub license](https://img.shields.io/github/license/hamano/pysmbc.svg)]()
 
