@@ -2,7 +2,7 @@ SMB bindings for Python
 -----------------------
 
 [![PyPI](https://img.shields.io/pypi/v/pysmbc.svg)](https://pypi.python.org/pypi/pysmbc/)
-[![Travis](https://img.shields.io/travis/hamano/pysmbc.svg)]()
+[![Build Status](https://travis-ci.org/hamano/pysmbc.svg?branch=master)](https://travis-ci.org/hamano/pysmbc)
 [![GitHub license](https://img.shields.io/github/license/hamano/pysmbc.svg)]()
 
 These Python bindings are intended to wrap the libsmbclient API.
