@@ -85,9 +85,12 @@ auth_fn (SMBCCTX *ctx,
       return;
     }
 
-  strncpy (workgroup, use_workgroup, wgmaxlen);
-  strncpy (username, use_username, unmaxlen);
-  strncpy (password, use_password, pwmaxlen);
+  strncpy (workgroup, use_workgroup, wgmaxlen - 1);
+  workgroup[wgmaxlen - 1] = '\0';
+  strncpy (username, use_username, unmaxlen - 1);
+  username[unmaxlen - 1] = '\0';
+  strncpy (password, use_password, pwmaxlen - 1);
+  password[pwmaxlen - 1] = '\0';
   Py_DECREF (result);
   debugprintf ("<- auth_fn(), got callback result\n");
 }
