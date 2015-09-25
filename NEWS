@@ -1,6 +1,9 @@
 NEWS
 ----
 
+New in 1.0.15.5:
+* fix NUL-termination bug
+
 New in 1.0.15.4:
 * added some constants
 
