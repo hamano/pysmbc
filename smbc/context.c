@@ -520,10 +520,8 @@ Context_getxattr (Context *self, PyObject *args)
   int ret;
   char *uri = NULL;
   char *name = NULL;
-  char value[1024];
+  char *buffer = NULL;
   static smbc_getxattr_fn fn;
-
-  bzero(value, sizeof (value));
 
   // smbc_getxattr takes two string parameters
   if (!PyArg_ParseTuple (args, "ss", &uri, &name))
@@ -531,17 +529,50 @@ Context_getxattr (Context *self, PyObject *args)
       return NULL;
     }
 
+  /* The security descriptor string returned by this call will vary depending on the requested attribute
+   * A call with system.nt_sec_desc.* will return the longest string which would be in the following format:
+   *
+   * REVISION:<revision number>,OWNER:<sid>,GROUP:<sid>,ACL:<sid>:<type>/<flags>/<mask>
+   *
+   * There could be multiple ACL entries up to a reasonable maximum of 1820.
+   *
+   * <revision number> : 3 chars
+   * <sid> :  184 chars
+   * <type>:  1 char
+   * <flags>: 3 chars
+   * <mask>:  10 chars
+   *
+   * The maximum size of the security descriptor string returned can be
+   * derived as follows (includes space for terminating null):
+   * Sec Desc = 13 + 2 x (7 + <sid>) + 1820 * (5 + <acl>) = 375315
+   *
+   * References: https://msdn.microsoft.com/en-us/library/cc246018.aspx
+   *             https://technet.microsoft.com/en-us/library/cc961995.aspx
+   *             https://technet.microsoft.com/en-us/library/cc961986.aspx
+   */
+
+  size_t size = 375315;
+  buffer = (char *)malloc (size);
+  if(!buffer)
+    return PyErr_NoMemory ();
+
+  bzero(buffer, size);
+
   errno = 0;
   fn = smbc_getFunctionGetxattr(self->context);
-  ret = (*fn)(self->context, uri, name, value, sizeof (value));
+  ret = (*fn)(self->context, uri, name, buffer, size);
 
   if (ret < 0)
     {
       pysmbc_SetFromErrno ();
+      free(buffer);
       return NULL;
-  }
+    }
 
-  return PyUnicode_FromString (value);
+  PyObject *value = PyUnicode_FromString(buffer);
+  free(buffer);
+
+  return value;
 }
 
 
