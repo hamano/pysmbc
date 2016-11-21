@@ -517,18 +517,6 @@ Context_chmod (Context *self, PyObject *args)
 static PyObject *
 Context_getxattr (Context *self, PyObject *args)
 {
-  int ret;
-  char *uri = NULL;
-  char *name = NULL;
-  char *buffer = NULL;
-  static smbc_getxattr_fn fn;
-
-  // smbc_getxattr takes two string parameters
-  if (!PyArg_ParseTuple (args, "ss", &uri, &name))
-    {
-      return NULL;
-    }
-
   /* The security descriptor string returned by this call will vary depending on the requested attribute
    * A call with system.nt_sec_desc.* will return the longest string which would be in the following format:
    *
@@ -551,28 +539,31 @@ Context_getxattr (Context *self, PyObject *args)
    *             https://technet.microsoft.com/en-us/library/cc961986.aspx
    */
 
-  size_t size = 375315;
-  buffer = (char *)malloc (size);
-  if(!buffer)
-    return PyErr_NoMemory ();
+  int ret;
+  char *uri = NULL;
+  char *name = NULL;
+  static smbc_getxattr_fn fn;
 
-  bzero(buffer, size);
+  // smbc_getxattr takes two string parameters
+  if (!PyArg_ParseTuple (args, "ss", &uri, &name))
+    {
+      return NULL;
+    }
+
+  char value[375315];
+  bzero(value, sizeof(value));
 
   errno = 0;
   fn = smbc_getFunctionGetxattr(self->context);
-  ret = (*fn)(self->context, uri, name, buffer, size);
+  ret = (*fn)(self->context, uri, name, value, sizeof(value));
 
   if (ret < 0)
     {
       pysmbc_SetFromErrno ();
-      free(buffer);
       return NULL;
     }
 
-  PyObject *value = PyUnicode_FromString(buffer);
-  free(buffer);
-
-  return value;
+  return PyUnicode_FromString(value);
 }
 
 
