@@ -381,12 +381,15 @@ Context_opendir (Context *self, PyObject *args)
     {
       smbc_DirType.tp_dealloc (dir);
       debugprintf ("%p <- Context_opendir() EXCEPTION\n", self->context);
-      return NULL;
+      dir = NULL;
     }
+	else
+	  {
+			debugprintf ("%p <- Context_opendir() = Dir\n", self->context);
+	  }
 
   Py_DECREF (largs);
   Py_DECREF (lkwlist);
-  debugprintf ("%p <- Context_opendir() = Dir\n", self->context);
   return dir;
 }
 
