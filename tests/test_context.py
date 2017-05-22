@@ -71,7 +71,7 @@ def test_xattr_get():
  *                     acl:<name or sid>
  *                     acl+:<name or sid
     """
-    print "test_xattr"
+    print("test_xattr")
     furl = touch_file("tmpfile.out")
 
     # create all combinations of attribute strings
@@ -81,7 +81,7 @@ def test_xattr_get():
 
     # check their existence
     for xattr in valid_xatts:
-        print "\ttesting %s with %s" % (furl, xattr)
+        print("\ttesting %s with %s" % (furl, xattr))
         assert(ctx.getxattr(furl, xattr))
     ctx.open(furl)
 
@@ -90,7 +90,7 @@ def test_xattr_get_error():
 
          Bad arguments include malformed xattrs and unexistent file
     """
-    print "test_xattr"
+    print("test_xattr")
     furl = touch_file("tmpfile.out")
 
     # create all combinations of attribute strings
@@ -108,7 +108,7 @@ def test_xattr_get_error():
 
     # check their existence
     for xattr in invalid_xatts:
-        print "\ttesting %s with %s" % (furl, xattr)
+        print("\ttesting %s with %s" % (furl, xattr))
         try:
             ctx.getxattr(furl, xattr)
             assert False, "getxattr should fail with %s" % xattr
@@ -120,14 +120,14 @@ def test_xattr_get_error():
 
 def test_xattr_set():
     #raise SkipTest("xattr_set to be implemented")
-    print "test_xattr_put"
+    print("test_xattr_put")
     furl = touch_file("tmpfile_set.out")
     attr_name = smbc.XATTR_ALL
     attrs = ctx.getxattr(furl, attr_name)
-    print "attrs(%s): %s" % (attr_name,  attrs)
+    print("attrs(%s): %s" % (attr_name,  attrs))
     ctx.setxattr(furl, attr_name, attrs, smbc.XATTR_FLAG_REPLACE)
     attrs1 = ctx.getxattr(furl, attr_name)
-    print "attrs1(%s): %s" % (attr_name,  attrs1)
+    print("attrs1(%s): %s" % (attr_name,  attrs1))
     assert attrs1 == attrs
 
 @SkipTest
@@ -141,19 +141,19 @@ def test_xattr_set_2():
         + ",ACL:\\Everyone:0/0/0x00120089'
     attr_name = smbc.XATTR_ALL_SID
     attrs_0 = ctx.getxattr(furl, attr_name)
-    print "original attrs(%s)" % attrs_0
+    print("original attrs(%s)" % attrs_0)
 
     assert attrs_0 != attrs_new, "Old and new attributes are the same:\n%s\n%s\n" % (attrs_0, attrs_new)
 
     ctx.setxattr(furl, attr_name, attrs_new, smbc.XATTR_FLAG_REPLACE)
     attrs_1 = ctx.getxattr(furl, attr_name)
 
-    print "attrs_1(%s): %s" % (attr_name,  attrs_1)
+    print("attrs_1(%s): %s" % (attr_name,  attrs_1))
     assert attrs_1 == attrs_new
 
 def test_xattr_set_error():
     #raise SkipTest("xattr_set to be implemented")
-    print "test_xattr_set_error"
+    print("test_xattr_set_error")
     furl = touch_file("tmpfile_set.out")
     attr_name = smbc.XATTR_ALL_SID
     attrs_ok = ctx.getxattr(furl, attr_name)
@@ -164,10 +164,10 @@ def test_xattr_set_error():
         except ValueError as e:
             (errno,strerror) = e.args 
             assert errno == EINVAL # invalid arguments
-            print "setxattr(%s) raises  %s" % (xa, e)
+            print("setxattr(%s) raises  %s" % (xa, e))
             pass
         except TypeError as e:
-            print "setxattr(%s) raises  %s" % (xa, e)
+            print("setxattr(%s) raises  %s" % (xa, e))
             pass 
     
     

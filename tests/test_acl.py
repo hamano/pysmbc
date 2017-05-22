@@ -32,11 +32,11 @@ class SmbAcl():
 
     @staticmethod
     def get_target(acl_s):
-	return acl_s[0:acl_s.index(":")]
+        return acl_s[0:acl_s.index(":")]
 
     @staticmethod
     def get_perm(acl_s):
-	return acl_s[acl_s.index(":")+1:]
+        return acl_s[acl_s.index(":")+1:]
 
 
 """SmbAcl parser To be implemented"""
@@ -49,7 +49,7 @@ def test_acl_parser():
     
     for xattr_s in xattr_l: 
         xattr = SmbAcl(xattr_s)
-        print "xattr: %s" % xattr
+        print("xattr: %s" % xattr)
         
         assert xattr.revision
         assert xattr.owner
@@ -64,5 +64,5 @@ def test_acl_get_target():
         target = SmbAcl.get_target(acl_s)
       
         assert target 
-	assert perm
+        assert perm
      
