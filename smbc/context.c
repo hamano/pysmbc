@@ -140,6 +140,9 @@ Context_init (Context *self, PyObject *args, PyObject *kwds)
       Py_XINCREF (auth);
       self->auth_fn = auth;
     }
+	
+  debugprintf ("-> Setting  client max protocol to SMB3()\n");
+  lp_set_cmdline("client max protocol", "SMB3");
 
   debugprintf ("-> Context_init ()\n");
 
