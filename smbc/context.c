@@ -919,6 +919,28 @@ Context_setOptionDebugToStderr (Context *self, PyObject *value,
 }
 
 static PyObject *
+Context_getOptionFullTimeNames (Context *self, void *closure)
+{
+  smbc_bool b;
+  b = smbc_getOptionFullTimeNames (self->context);
+  return PyBool_FromLong ((long) b);
+}
+
+static int
+Context_setOptionFullTimeNames (Context *self, PyObject *value,
+				void *closure)
+{
+  if (!PyBool_Check (value))
+    {
+      PyErr_SetString (PyExc_TypeError, "must be Boolean");
+      return -1;
+    }
+
+  smbc_setOptionFullTimeNames (self->context, value == Py_True);
+  return 0;
+}
+
+static PyObject *
 Context_getOptionNoAutoAnonymousLogin (Context *self, void *closure)
 {
   smbc_bool b;
@@ -1020,6 +1042,12 @@ PyGetSetDef Context_getseters[] =
       (getter) Context_getOptionDebugToStderr,
       (setter) Context_setOptionDebugToStderr,
       "Whether to log to standard error instead of standard output.",
+      NULL },
+
+		{ "optionFullTimeNames",
+      (getter) Context_getOptionFullTimeNames,
+      (setter) Context_setOptionFullTimeNames,
+      "Use full time names (Create Time)",
       NULL },
 
     { "optionNoAutoAnonymousLogin",
