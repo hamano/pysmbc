@@ -5,6 +5,7 @@
 ## Authors:
 ##  Tim Waugh <twaugh@redhat.com>
 ##  Tsukasa Hamano <hamano@osstech.co.jp>
+##  Laurent Coustet <laurent.coustet@clarisys.fr>
 
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -50,43 +51,50 @@ hello
 
 """
 
-from distutils.core import setup, Extension
 import subprocess
+from setuptools import setup, Extension
 
-def pkgconfig_I (pkg):
+def pkgconfig_I(pkg):
     dirs = []
-    c = subprocess.Popen (["pkg-config", "--cflags", pkg],
-                          stdout=subprocess.PIPE)
+    c = subprocess.Popen(["pkg-config", "--cflags", pkg], stdout=subprocess.PIPE)
     (stdout, stderr) = c.communicate ()
-    for p in stdout.decode ('ascii').split ():
-        if p.startswith ("-I"):
-            dirs.append (p[2:])
+    for p in stdout.decode('ascii').split():
+        if p.startswith("-I"):
+            dirs.append(p[2:])
     return dirs
-    
-setup (name="pysmbc",
-       version="1.0.15.8",
-       description="Python bindings for libsmbclient",
-       long_description=__doc__,
-       author=["Tim Waugh <twaugh@redhat.com>",
-               "Tsukasa Hamano <hamano@osstech.co.jp>",
-               "Roberto Polli <rpolli@babel.it>" ],
-       url="http://cyberelk.net/tim/software/pysmbc/",
-       download_url="http://cyberelk.net/tim/data/pysmbc/",
-       classifiers=[
+
+setup(
+    name="pysmbc",
+    version="1.0.15.9",
+    description="Python bindings for libsmbclient",
+    long_description=__doc__,
+    author=[
+        "Tim Waugh <twaugh@redhat.com>",
+        "Tsukasa Hamano <hamano@osstech.co.jp>",
+        "Roberto Polli <rpolli@babel.it>",
+    ],
+    url="http://cyberelk.net/tim/software/pysmbc/",
+    download_url="http://cyberelk.net/tim/data/pysmbc/",
+    license="GPLv2+",
+    packages=["smbc"],
+    classifiers=[
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "License :: OSI Approved :: GNU General Public License (GPL)",
         "Development Status :: 5 - Production/Stable",
         "Operating System :: Unix",
         "Programming Language :: C",
+    ],
+    ext_modules=[
+        Extension("_smbc", [
+            "smbc/smbcmodule.c",
+            "smbc/context.c",
+            "smbc/dir.c",
+            "smbc/file.c",
+            "smbc/smbcdirent.c"
         ],
-       license="GPLv2+",
-       packages=["smbc"],
-       ext_modules=[Extension("_smbc",
-                              ["smbc/smbcmodule.c",
-                               "smbc/context.c",
-                               "smbc/dir.c",
-                               "smbc/file.c",
-                               "smbc/smbcdirent.c"],
-                              libraries=["smbclient"],
-                              include_dirs=pkgconfig_I("smbclient"))])
+        libraries=["smbclient"],
+        include_dirs=pkgconfig_I("smbclient")
+        )
+    ],
+)
