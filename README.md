@@ -13,7 +13,7 @@ Prerequisites
 
 Currently libsmbclient 3.2.x or later is required.  Ubuntu Example:
 ~~~
-# sudo apt install pkg-config libopencv-dev smbclient libsmbclient-dev
+# sudo apt install pkg-config libopencv-dev smbclient libsmbclient libsmbclient-dev
 ~~~
 
 Build
