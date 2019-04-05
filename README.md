@@ -7,10 +7,17 @@ SMB bindings for Python
 
 These Python bindings are intended to wrap the libsmbclient API.
 
-Currently libsmbclient 3.2.x or later is required.
 
+Prerequisites
+------
 
-To build, simply use
+Currently libsmbclient 3.2.x or later is required.  Ubuntu Example:
+~~~
+# sudo apt install pkg-config libopencv-dev smbclient libsmbclient libsmbclient-dev
+~~~
+
+Build
+------
 ~~~
 # make
 ~~~
