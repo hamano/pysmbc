@@ -73,8 +73,7 @@ setup(
         "Tsukasa Hamano <hamano@osstech.co.jp>",
         "Roberto Polli <rpolli@babel.it>",
     ],
-    url="http://cyberelk.net/tim/software/pysmbc/",
-    download_url="http://cyberelk.net/tim/data/pysmbc/",
+    url="https://github.com/hamano/pysmbc",
     license="GPLv2+",
     packages=["smbc"],
     classifiers=[
