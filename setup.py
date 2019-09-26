@@ -74,7 +74,7 @@ def pkgconfig_L(pkg):
 
 setup(
     name="pysmbc",
-    version="1.0.16",
+    version="1.0.17",
     description="Python bindings for libsmbclient",
     long_description=__doc__,
     author=[
