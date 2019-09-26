@@ -173,6 +173,30 @@ File_read (File *self, PyObject *args)
 }
 
 static PyObject *
+File_readinto (File *self, PyObject *args)
+{
+  Context *ctx = self->context;
+  smbc_read_fn fn;
+  Py_buffer buf;
+  ssize_t len;
+
+  if (!PyArg_ParseTuple (args, "|s*", &buf))
+       return NULL;
+
+  fn = smbc_getFunctionRead (ctx->context);
+
+  len = (*fn) (ctx->context, self->file, buf.buf, buf.len);
+  PyBuffer_Release(&buf);
+  if (len < 0)
+    {
+      pysmbc_SetFromErrno ();
+      return NULL;
+    }
+
+  return PyLong_FromLong (len);
+}
+
+static PyObject *
 File_write (File *self, PyObject *args)
 {
   Context *ctx = self->context;
@@ -306,6 +330,12 @@ PyMethodDef File_methods[] =
 	 "@type size: int\n"
 	 "@param size: size of reading\n"
 	 "@return: read data"
+	},
+	{"readinto", (PyCFunction)File_readinto, METH_VARARGS,
+	 "readinto(b) -> int\n\n"
+	 "@type b: writable bytes-like object\n"
+	 "@param b: buffer to fill\n"
+	 "@return: number of bytes read"
 	},
 	{"write", (PyCFunction)File_write, METH_VARARGS,
 	 "write(buf) -> int\n\n"
