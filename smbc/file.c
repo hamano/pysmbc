@@ -176,16 +176,16 @@ static PyObject *
 File_write (File *self, PyObject *args)
 {
   Context *ctx = self->context;
-  int size = 0;
   smbc_write_fn fn;
-  char *buf;
+  Py_buffer buf;
   ssize_t len;
 
-  if (!PyArg_ParseTuple (args, "s#", &buf, &size))
+  if (!PyArg_ParseTuple (args, "s*", &buf))
     return NULL;
 
   fn = smbc_getFunctionWrite (ctx->context);
-  len = (*fn) (ctx->context, self->file, buf, size);
+  len = (*fn) (ctx->context, self->file, buf.buf, buf.len);
+  PyBuffer_Release(&buf);
   if (len < 0)
     {
       pysmbc_SetFromErrno ();
