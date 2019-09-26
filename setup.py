@@ -63,6 +63,15 @@ def pkgconfig_I(pkg):
             dirs.append(p[2:])
     return dirs
 
+def pkgconfig_L(pkg):
+    dirs = []
+    c = subprocess.Popen(["pkg-config", "--libs", pkg], stdout=subprocess.PIPE)
+    (stdout, stderr) = c.communicate ()
+    for p in stdout.decode('ascii').split():
+        if p.startswith("-L"):
+            dirs.append(p[2:])
+    return dirs
+
 setup(
     name="pysmbc",
     version="1.0.16",
@@ -93,6 +102,7 @@ setup(
             "smbc/smbcdirent.c"
         ],
         libraries=["smbclient"],
+        library_dirs=pkgconfig_L("smbclient"),
         include_dirs=pkgconfig_I("smbclient")
         )
     ],
