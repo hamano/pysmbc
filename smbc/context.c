@@ -228,97 +228,123 @@ Context_set_credentials_with_fallback (Context *self, PyObject *args)
 
 static PyObject *
 Context_open (Context *self, PyObject *args)
-{
-  PyObject *largs, *lkwlist;
-  char *uri;
-  File *file;
-  int flags = 0;
-  int mode = 0;
-  smbc_open_fn fn;
+  {
+    PyObject *result = NULL;
+    PyObject *largs = NULL;
+    PyObject *lkwlist = NULL;
+    char *uri;
+    File *file = NULL;
+    int flags = 0;
+    int mode = 0;
+    smbc_open_fn fn_open;
 
-  debugprintf ("%p -> Context_open()\n", self->context);
-  if (!PyArg_ParseTuple (args, "s|ii", &uri, &flags, &mode))
-    {
-      debugprintf ("%p <- Context_open() EXCEPTION\n", self->context);
-      return NULL;
-    }
-
-  largs = Py_BuildValue ("()");
-  lkwlist = PyDict_New ();
-  PyDict_SetItemString (lkwlist, "context", (PyObject *) self);
-  file = (File *)smbc_FileType.tp_new (&smbc_FileType, largs, lkwlist);
-  if (!file)
-    {
-      return PyErr_NoMemory ();
-    }
-
-  if (smbc_FileType.tp_init ((PyObject *)file, largs, lkwlist) < 0)
-    {
-      smbc_FileType.tp_dealloc ((PyObject *)file);
-      debugprintf ("%p <- Context_open() EXCEPTION\n", self->context);
-      // already set error
-      return NULL;
-    }
-
-  fn = smbc_getFunctionOpen (self->context);
-  errno = 0;
-  file->file = (*fn) (self->context, uri, (int)flags, (mode_t)mode);
-  if (!file->file)
-    {
-      pysmbc_SetFromErrno ();
-      smbc_FileType.tp_dealloc ((PyObject *)file);
-      file = NULL;
-    }
-
-  Py_DECREF (largs);
-  Py_DECREF (lkwlist);
-  debugprintf ("%p <- Context_open() = File\n", self->context);
-  return (PyObject *)file;
-}
+    debugprintf ("%p -> Context_open()\n", self->context);
+    do /*once*/
+      {
+        if (!PyArg_ParseTuple (args, "s|ii", &uri, &flags, &mode))
+          {
+            debugprintf ("%p <- Context_open() EXCEPTION\n", self->context);
+            break;
+          } /*if*/
+        largs = Py_BuildValue("()");
+        if (PyErr_Occurred())
+            break;
+        lkwlist = PyDict_New();
+        if (PyErr_Occurred())
+            break;
+        PyDict_SetItemString(lkwlist, "context", (PyObject *)self);
+        if (PyErr_Occurred())
+            break;
+        file = (File *)smbc_FileType.tp_new(&smbc_FileType, largs, lkwlist);
+        if (file == NULL)
+          {
+            PyErr_NoMemory();
+            break;
+          } /*if*/
+        if (smbc_FileType.tp_init((PyObject *)file, largs, lkwlist) < 0)
+          {
+            debugprintf ("%p <- Context_open() EXCEPTION\n", self->context);
+            // already set error
+            break;
+          } /*if*/
+        fn_open = smbc_getFunctionOpen(self->context);
+        errno = 0;
+        file->file = fn_open(self->context, uri, (int)flags, (mode_t)mode);
+        if (file->file == NULL)
+          {
+            pysmbc_SetFromErrno();
+            break;
+          } /*if*/
+        debugprintf ("%p <- Context_open() = File\n", self->context);
+      /* all done */
+        result = (PyObject *)file;
+        file = NULL; /* so I don't dispose of it yet */
+      }
+    while (false);
+    if (file != NULL)
+      {
+        smbc_FileType.tp_dealloc((PyObject *)file);
+      } /*if*/
+    Py_XDECREF(largs);
+    Py_XDECREF(lkwlist);
+    return
+        result;
+  } /*Context_open*/
 
 static PyObject *
 Context_creat (Context *self, PyObject *args)
-{
-  PyObject *largs, *lkwlist;
-  char *uri;
-  int mode = 0;
-  File *file;
-  smbc_creat_fn fn;
+  {
+    PyObject *result = NULL;
+    PyObject *largs = NULL;
+    PyObject *lkwlist = NULL;
+    char *uri;
+    int mode = 0;
+    File *file = NULL;
+    smbc_creat_fn fn_creat;
 
-  if (!PyArg_ParseTuple (args, "s|i", &uri, &mode))
-    {
-      return NULL;
-    }
-
-  largs = Py_BuildValue ("()");
-  lkwlist = PyDict_New ();
-  PyDict_SetItemString (lkwlist, "context", (PyObject *) self);
-  file = (File *)smbc_FileType.tp_new (&smbc_FileType, largs, lkwlist);
-  if (!file)
-    {
-      return PyErr_NoMemory();
-    }
-
-  if (smbc_FileType.tp_init ((PyObject *)file, largs, lkwlist) < 0)
-    {
-      smbc_FileType.tp_dealloc ((PyObject *)file);
-      return NULL;
-    }
-
-  fn = smbc_getFunctionCreat (self->context);
-  errno = 0;
-  file->file = (*fn) (self->context, uri, mode);
-  if (!file->file)
-    {
-      pysmbc_SetFromErrno ();
-      smbc_FileType.tp_dealloc ((PyObject *)file);
-      file = NULL;
-    }
-
-  Py_DECREF (largs);
-  Py_DECREF (lkwlist);
-  return (PyObject *)file;
-}
+    do /*once*/
+      {
+        if (!PyArg_ParseTuple (args, "s|i", &uri, &mode))
+            break;
+        largs = Py_BuildValue("()");
+        if (PyErr_Occurred())
+            break;
+        lkwlist = PyDict_New();
+        if (PyErr_Occurred())
+            break;
+        PyDict_SetItemString(lkwlist, "context", (PyObject *)self);
+        if (PyErr_Occurred())
+            break;
+        file = (File *)smbc_FileType.tp_new(&smbc_FileType, largs, lkwlist);
+        if (file == NULL)
+          {
+            PyErr_NoMemory();
+            break;
+          } /*if*/
+        if (smbc_FileType.tp_init((PyObject *)file, largs, lkwlist) < 0)
+            break;
+        fn_creat = smbc_getFunctionCreat (self->context);
+        errno = 0;
+        file->file = fn_creat(self->context, uri, mode);
+        if (file->file == NULL)
+          {
+            pysmbc_SetFromErrno();
+            break;
+          } /*if*/
+      /* all done */
+        result = (PyObject *)file;
+        file = NULL; /* so I don't dispose of it yet */
+      }
+    while (false);
+    if (file != NULL)
+      {
+        smbc_FileType.tp_dealloc((PyObject *)file);
+      } /*if*/
+    Py_XDECREF(largs);
+    Py_XDECREF(lkwlist);
+    return
+        result;
+  } /*Context_creat*/
 
 static PyObject *
 Context_unlink (Context *self, PyObject *args)
@@ -380,38 +406,59 @@ Context_rename (Context *self, PyObject *args)
 
 static PyObject *
 Context_opendir (Context *self, PyObject *args)
-{
-  PyObject *largs, *lkwlist;
-  PyObject *uri;
-  PyObject *dir;
+  {
+    PyObject *result = NULL;
+    PyObject *largs = NULL;
+    PyObject *lkwlist = NULL;
+    PyObject *uri;
+    PyObject *dir = NULL;
 
-  debugprintf ("%p -> Context_opendir()\n", self->context);
-  if (!PyArg_ParseTuple (args, "O", &uri))
-    {
-      debugprintf ("%p <- Context_opendir() EXCEPTION\n", self->context);
-      return NULL;
-    }
-
-  largs = Py_BuildValue ("()");
-  lkwlist = PyDict_New ();
-  PyDict_SetItemString (lkwlist, "context", (PyObject *) self);
-  PyDict_SetItemString (lkwlist, "uri", uri);
-  dir = smbc_DirType.tp_new (&smbc_DirType, largs, lkwlist);
-  if (smbc_DirType.tp_init (dir, largs, lkwlist) < 0)
-    {
-      smbc_DirType.tp_dealloc (dir);
-      debugprintf ("%p <- Context_opendir() EXCEPTION\n", self->context);
-      dir = NULL;
-    }
-	else
-	  {
-			debugprintf ("%p <- Context_opendir() = Dir\n", self->context);
-	  }
-
-  Py_DECREF (largs);
-  Py_DECREF (lkwlist);
-  return dir;
-}
+    debugprintf ("%p -> Context_opendir()\n", self->context);
+    do /*once*/
+      {
+        if (!PyArg_ParseTuple(args, "O", &uri))
+          {
+            debugprintf ("%p <- Context_opendir() EXCEPTION\n", self->context);
+            break;
+          } /*if*/
+        largs = Py_BuildValue("()");
+        if (PyErr_Occurred())
+            break;
+        lkwlist = PyDict_New();
+        if (PyErr_Occurred())
+            break;
+        PyDict_SetItemString(lkwlist, "context", (PyObject *) self);
+        if (PyErr_Occurred())
+            break;
+        PyDict_SetItemString(lkwlist, "uri", uri);
+        if (PyErr_Occurred())
+            break;
+        dir = smbc_DirType.tp_new(&smbc_DirType, largs, lkwlist);
+        if (dir == NULL)
+          {
+            PyErr_NoMemory();
+            break;
+          } /*if*/
+        if (smbc_DirType.tp_init(dir, largs, lkwlist) < 0)
+          {
+            debugprintf ("%p <- Context_opendir() EXCEPTION\n", self->context);
+            break;
+          } /*if*/
+        debugprintf ("%p <- Context_opendir() = Dir\n", self->context);
+      /* all done */
+        result = (PyObject *)dir;
+        dir = NULL; /* so I don't dispose of it yet */
+      }
+    while (false);
+    if (dir != NULL)
+      {
+        smbc_DirType.tp_dealloc(dir);
+      } /*if*/
+    Py_XDECREF(largs);
+    Py_XDECREF(lkwlist);
+    return
+        result;
+  } /*Context_opendir*/
 
 static PyObject *
 Context_mkdir (Context *self, PyObject *args)

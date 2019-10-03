@@ -24,6 +24,7 @@
 #ifndef HAVE_SMBCMODULE_H
 #define HAVE_SMBCMODULE_H
 
+#include <stdbool.h>
 #include <libsmbclient.h>
 
 /* GCC attributes */
