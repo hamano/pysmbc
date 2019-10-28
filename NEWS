@@ -1,6 +1,15 @@
 NEWS
 ----
 
+New in 1.0.18:
+* Support Fix memleak for auth_fn #32
+* Support readinto #31
+
+New in 1.0.17:
+* Support buffer protocol #30
+* exceptions: use a shared superclass #28
+* setup: autodetect required library dirs #27
+
 New in 1.0.15.5:
 * fix NUL-termination bug
 

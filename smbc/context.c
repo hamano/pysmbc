@@ -137,7 +137,7 @@ Context_init (Context *self, PyObject *args, PyObject *kwds)
 	  return -1;
 	}
 
-      Py_XINCREF (auth);
+      Py_INCREF (auth);
       self->auth_fn = auth;
     }
 	
@@ -183,6 +183,7 @@ Context_dealloc (Context *self)
       smbc_free_context (self->context, 1);
     }
 
+  Py_XDECREF (self->auth_fn);
   Py_TYPE(self)->tp_free ((PyObject *) self);
 }
 
@@ -890,7 +891,8 @@ Context_setFunctionAuthData (Context *self, PyObject *value, void *closure)
       return -1;
     }
 
-  Py_XINCREF (value);
+  Py_XDECREF (self->auth_fn);
+  Py_INCREF (value);
   self->auth_fn = value;
   smbc_setFunctionAuthDataWithContext (self->context, auth_fn);
   return 0;

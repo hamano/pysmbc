@@ -63,9 +63,18 @@ def pkgconfig_I(pkg):
             dirs.append(p[2:])
     return dirs
 
+def pkgconfig_L(pkg):
+    dirs = []
+    c = subprocess.Popen(["pkg-config", "--libs", pkg], stdout=subprocess.PIPE)
+    (stdout, stderr) = c.communicate ()
+    for p in stdout.decode('ascii').split():
+        if p.startswith("-L"):
+            dirs.append(p[2:])
+    return dirs
+
 setup(
     name="pysmbc",
-    version="1.0.15.9",
+    version="1.0.18",
     description="Python bindings for libsmbclient",
     long_description=__doc__,
     author=[
@@ -73,8 +82,7 @@ setup(
         "Tsukasa Hamano <hamano@osstech.co.jp>",
         "Roberto Polli <rpolli@babel.it>",
     ],
-    url="http://cyberelk.net/tim/software/pysmbc/",
-    download_url="http://cyberelk.net/tim/data/pysmbc/",
+    url="https://github.com/hamano/pysmbc",
     license="GPLv2+",
     packages=["smbc"],
     classifiers=[
@@ -94,6 +102,7 @@ setup(
             "smbc/smbcdirent.c"
         ],
         libraries=["smbclient"],
+        library_dirs=pkgconfig_L("smbclient"),
         include_dirs=pkgconfig_I("smbclient")
         )
     ],
