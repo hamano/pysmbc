@@ -140,7 +140,7 @@ Context_init (Context *self, PyObject *args, PyObject *kwds)
       Py_INCREF (auth);
       self->auth_fn = auth;
     }
-	
+
   debugprintf ("-> Setting  client max protocol to SMB3()\n");
   lp_set_cmdline("client max protocol", "SMB3");
 
@@ -882,6 +882,34 @@ Context_setTimeout (Context *self, PyObject *value, void *closure)
   return 0;
 }
 
+static PyObject *
+Context_getPort (Context *self, void *closure)
+{
+  int port = smbc_getPort (self->context);
+  return PyLong_FromLong (port);
+}
+
+static int
+Context_setPort (Context *self, PyObject *value, void *closure)
+{
+#if PY_MAJOR_VERSION < 3
+  if (!PyInt_Check (value))
+#else
+  if (!PyLong_Check (value))
+#endif
+    {
+      PyErr_SetString (PyExc_TypeError, "must be long");
+      return -1;
+    }
+
+#if PY_MAJOR_VERSION < 3
+  smbc_setPort (self->context, PyInt_AsLong (value));
+#else
+  smbc_setPort (self->context, PyLong_AsLong (value));
+#endif
+  return 0;
+}
+
 static int
 Context_setFunctionAuthData (Context *self, PyObject *value, void *closure)
 {
@@ -1032,6 +1060,12 @@ PyGetSetDef Context_getseters[] =
       (getter) Context_getTimeout,
       (setter) Context_setTimeout,
       "Get the timeout used for waiting on connections and response data(in milliseconds)",
+      NULL },
+
+		{ "port",
+      (getter) Context_getPort,
+      (setter) Context_setPort,
+      "Set the TCP port used to connect (0 means default).",
       NULL },
 
     { "functionAuthData",
@@ -1186,7 +1220,7 @@ PyMethodDef Context_methods[] =
 "                  to names.  Without the plus sign, SIDs are not mapped;\n"
 "                  rather they are simply converted to a string format.\n"
       "@return: a string representing the actual extended attributes of the uri" },
-      
+
        { "setxattr",
       (PyCFunction) Context_setxattr, METH_VARARGS,
       "setxattr(uri, the_acl) -> int\n\n"
