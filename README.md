@@ -13,8 +13,10 @@ Prerequisites
 
 Currently libsmbclient 3.2.x or later is required.  Ubuntu Example:
 ~~~
-# sudo apt install pkg-config libopencv-dev smbclient libsmbclient libsmbclient-dev
+# sudo apt install build-essential pkg-config smbclient libsmbclient libsmbclient-dev python-dev
 ~~~
+
+Or `python3-dev` instead of `python-dev` depending on your needs.
 
 Build
 ------
@@ -49,8 +51,8 @@ To selectively run test methods, printing output to console
 
 NOTE: to run your tests, you need
 
- * a running samba server 
- * one shared folder with 
+ * a running samba server
+ * one shared folder with
 	* rw permissions
  	* guest ok = no
 
@@ -105,4 +107,3 @@ Read file
 >>> print file.read()
 hello
 ~~~
-
