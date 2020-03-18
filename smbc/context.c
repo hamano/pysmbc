@@ -116,15 +116,17 @@ Context_init (Context *self, PyObject *args, PyObject *kwds)
   PyObject *auth = NULL;
   int debug = 0;
   SMBCCTX *ctx;
+  char *proto = NULL;
   static char *kwlist[] =
     {
       "auth_fn",
       "debug",
+      "proto",
       NULL
     };
 
-  if (!PyArg_ParseTupleAndKeywords (args, kwds, "|Oi", kwlist,
-				    &auth, &debug))
+  if (!PyArg_ParseTupleAndKeywords (args, kwds, "|Oi|s", kwlist,
+				    &auth, &debug, &proto))
     {
       return -1;
     }
@@ -141,8 +143,17 @@ Context_init (Context *self, PyObject *args, PyObject *kwds)
       self->auth_fn = auth;
     }
 
-  debugprintf ("-> Setting  client max protocol to SMB3()\n");
-  lp_set_cmdline("client max protocol", "SMB3");
+  debugprintf("-> wanted proto ver %s\n", proto);
+  if(proto)
+  {
+    debugprintf ("-> Setting  client max protocol to %s()\n", proto);
+    lp_set_cmdline("client max protocol", proto);
+    debugprintf ("-> Setting  client min protocol to %s()\n", proto);
+    lp_set_cmdline("client min protocol", proto);
+  } else {
+    debugprintf ("-> Setting  client max protocol to SMB3()\n");
+    lp_set_cmdline("client max protocol", "SMB3");
+  }
 
   debugprintf ("-> Context_init ()\n");
 
