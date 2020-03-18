@@ -1,5 +1,7 @@
 NEWS
 ----
+New in 1.0.19:
+* Added SAMBA protocol version optional variable #41
 
 New in 1.0.18:
 * Support Fix memleak for auth_fn #32
