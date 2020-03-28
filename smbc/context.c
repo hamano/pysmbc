@@ -125,7 +125,7 @@ Context_init (Context *self, PyObject *args, PyObject *kwds)
       NULL
     };
 
-  if (!PyArg_ParseTupleAndKeywords (args, kwds, "|Oi|s", kwlist,
+  if (!PyArg_ParseTupleAndKeywords (args, kwds, "|Ois", kwlist,
 				    &auth, &debug, &proto))
     {
       return -1;
