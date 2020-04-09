@@ -150,9 +150,6 @@ Context_init (Context *self, PyObject *args, PyObject *kwds)
     lp_set_cmdline("client max protocol", proto);
     debugprintf ("-> Setting  client min protocol to %s()\n", proto);
     lp_set_cmdline("client min protocol", proto);
-  } else {
-    debugprintf ("-> Setting  client max protocol to SMB3()\n");
-    lp_set_cmdline("client max protocol", "SMB3");
   }
 
   debugprintf ("-> Context_init ()\n");
