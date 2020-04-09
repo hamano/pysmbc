@@ -1,5 +1,8 @@
 NEWS
 ----
+New in 1.0.21:
+* Fix protocol support #45
+
 New in 1.0.19:
 * Added SAMBA protocol version optional variable #41
 
