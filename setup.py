@@ -72,6 +72,16 @@ def pkgconfig_L(pkg):
             dirs.append(p[2:])
     return dirs
 
+def pkgconfig_Dversion(pkg, prefix=None):
+    if prefix is None:
+        prefix = pkg.upper() + '_'
+    c = subprocess.Popen(["pkg-config", "--modversion", pkg],
+                         stdout=subprocess.PIPE)
+    (stdout, stderr) = c.communicate()
+    vers = stdout.decode('ascii').rstrip().split('.')
+    ver = str(int(vers[0]) * 10000 + int(vers[1]) * 100 + int(vers[2]))
+    return [(prefix + 'VERSION', ver)]
+
 setup(
     name="pysmbc",
     version="1.0.20",
@@ -103,7 +113,8 @@ setup(
         ],
         libraries=["smbclient"],
         library_dirs=pkgconfig_L("smbclient"),
-        include_dirs=pkgconfig_I("smbclient")
+        include_dirs=pkgconfig_I("smbclient"),
+        define_macros=pkgconfig_Dversion("smbclient"),
         )
     ],
 )
