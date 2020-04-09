@@ -146,9 +146,9 @@ Context_init (Context *self, PyObject *args, PyObject *kwds)
   debugprintf("-> wanted proto ver %s\n", proto);
   if(proto)
   {
-    debugprintf ("-> Setting  client max protocol to %s()\n", proto);
+    debugprintf ("-> Setting client max protocol to %s\n", proto);
     lp_set_cmdline("client max protocol", proto);
-    debugprintf ("-> Setting  client min protocol to %s()\n", proto);
+    debugprintf ("-> Setting client min protocol to %s\n", proto);
     lp_set_cmdline("client min protocol", proto);
   }
 
