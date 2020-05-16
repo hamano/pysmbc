@@ -323,6 +323,13 @@ File_lseek (File *self, PyObject *args)
   return Py_BuildValue (OFF_T_FORMAT, ret);
 }
 
+static PyObject *
+File_tell (File *self)
+{
+  PyObject *args = Py_BuildValue (OFF_T_FORMAT "i",  0, 1);
+  return File_lseek (self, args);
+}
+
 PyMethodDef File_methods[] =
   {
 	{"read", (PyCFunction)File_read, METH_VARARGS,
@@ -358,6 +365,10 @@ PyMethodDef File_methods[] =
 	{"seek", (PyCFunction)File_lseek, METH_VARARGS,
 	 "seek(offset, whence=0)\n\n"
 	 "@return: on success, current offset location, othwerwise -1"
+	},
+	{"tell", (PyCFunction)File_tell, METH_NOARGS,
+	 "tell() -> int\n\n"
+	 "@return: on success, current location, othwerwise -1"
 	},
     { NULL } /* Sentinel */
   };
