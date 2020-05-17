@@ -329,6 +329,13 @@ File_flush (PyObject *self)
   return NULL;
 }
 
+static PyObject *
+File_tell (File *self)
+{
+  PyObject *args = Py_BuildValue (OFF_T_FORMAT "i",  0, 1);
+  return File_lseek (self, args);
+}
+
 PyMethodDef File_methods[] =
   {
 	{"read", (PyCFunction)File_read, METH_VARARGS,
@@ -368,6 +375,10 @@ PyMethodDef File_methods[] =
 	{"flush", (PyCFunction)File_flush, METH_NOARGS,
 	 "flush()\n\n"
 	 "@return: NOP function"
+	},
+	{"tell", (PyCFunction)File_tell, METH_NOARGS,
+	 "tell() -> int\n\n"
+	 "@return: on success, current location, othwerwise -1"
 	},
     { NULL } /* Sentinel */
   };
