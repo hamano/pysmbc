@@ -324,6 +324,12 @@ File_lseek (File *self, PyObject *args)
 }
 
 static PyObject *
+File_flush (PyObject *self)
+{
+  return NULL;
+}
+
+static PyObject *
 File_tell (File *self)
 {
   PyObject *args = Py_BuildValue (OFF_T_FORMAT "i",  0, 1);
@@ -365,6 +371,10 @@ PyMethodDef File_methods[] =
 	{"seek", (PyCFunction)File_lseek, METH_VARARGS,
 	 "seek(offset, whence=0)\n\n"
 	 "@return: on success, current offset location, othwerwise -1"
+	},
+	{"flush", (PyCFunction)File_flush, METH_NOARGS,
+	 "flush()\n\n"
+	 "@return: NOP function"
 	},
 	{"tell", (PyCFunction)File_tell, METH_NOARGS,
 	 "tell() -> int\n\n"
