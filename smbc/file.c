@@ -142,6 +142,8 @@ File_read (File *self, PyObject *args)
   PyObject *ret;
   smbc_fstat_fn fn_fstat;
   struct stat st;
+  smbc_lseek_fn fn_lseek;
+  int current = 0;
 
   if (!PyArg_ParseTuple (args, "|k", &size))
 	return NULL;
@@ -152,7 +154,9 @@ File_read (File *self, PyObject *args)
     {
       fn_fstat = smbc_getFunctionFstat (ctx->context);
       (*fn_fstat) (ctx->context, self->file, &st);
-      size = st.st_size;
+      fn_lseek = smbc_getFunctionLseek (ctx->context);
+      current = (*fn_lseek) (ctx->context, self->file, 0, 1);
+      size = st.st_size-current;
     }
 
   buf = (char *)malloc (size);
