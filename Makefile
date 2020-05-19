@@ -1,7 +1,6 @@
 PYTHON=python
 NAME=pysmbc
 VERSION:=$(shell $(PYTHON) setup.py --version)
-SDIST_ARGS=--formats=bztar -d.
 
 _smbc.so: force
 	$(PYTHON) setup.py build
