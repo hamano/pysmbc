@@ -1,5 +1,12 @@
 NEWS
 ----
+New in 1.0.22:
+* Add File_seekable #52
+* Rework some routines to fix holes in error checking and potential mem… #50
+* Fix File_read when the current location is not zero #49
+* Add File_flush #48
+* Add File_tell #47
+
 New in 1.0.21:
 * Fix protocol support #45
 
