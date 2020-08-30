@@ -79,6 +79,16 @@ def pkgconfig_Dversion(pkg, prefix=None):
                          stdout=subprocess.PIPE)
     (stdout, stderr) = c.communicate()
     vers = stdout.decode('ascii').rstrip().split('.')
+    if len(vers) < 3:
+        c = subprocess.Popen([pkg, "-V"],
+                             stdout=subprocess.PIPE)
+        (stdout, stderr) = c.communicate()
+        vers = stdout.decode('ascii') \
+                .replace('Version ', '') \
+                .strip() \
+                .split('-')[0] \
+                .split('.')
+    assert len(vers) >= 3, 'The length ({}) of vers ({}) is less than 3.'.format(len(vers), vers)
     ver = str(int(vers[0]) * 10000 + int(vers[1]) * 100 + int(vers[2]))
     return [(prefix + 'VERSION', ver)]
 
