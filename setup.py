@@ -79,7 +79,10 @@ def pkgconfig_Dversion(pkg, prefix=None):
                          stdout=subprocess.PIPE)
     (stdout, stderr) = c.communicate()
     vers = stdout.decode('ascii').rstrip().split('.')
-    ver = str(int(vers[0]) * 10000 + int(vers[1]) * 100 + int(vers[2]))
+    if len(vers) == 3:
+        ver = str(int(vers[0]) * 10000 + int(vers[1]) * 100 + int(vers[2]))
+    else:
+        ver = str(int(vers[0]))
     return [(prefix + 'VERSION', ver)]
 
 setup(
