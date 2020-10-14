@@ -805,7 +805,12 @@ Context_setNetbiosName (Context *self, PyObject *value, void *closure)
       return -1;
     }
 
-  chars = PyUnicode_GetSize (value); /* not including NUL */
+#if PY_MAJOR_VERSION > 3
+  chars = PyUnicode_GET_LENGTH(value);
+#else
+  chars = PyUnicode_GET_SIZE(value); /* not including NUL */
+#endif
+
   w_name = malloc ((chars + 1) * sizeof (wchar_t));
   if (!w_name)
     {
@@ -874,7 +879,12 @@ Context_setWorkgroup (Context *self, PyObject *value, void *closure)
       return -1;
     }
 
-  chars = PyUnicode_GetSize (value); /* not including NUL */
+#if PY_MAJOR_VERSION > 3
+  chars = PyUnicode_GET_LENGTH(value);
+#else
+  chars = PyUnicode_GET_SIZE(value); /* not including NUL */
+#endif
+
   w_workgroup = malloc ((chars + 1) * sizeof (wchar_t));
   if (!w_workgroup)
     {
