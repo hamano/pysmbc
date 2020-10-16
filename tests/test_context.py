@@ -118,6 +118,7 @@ def test_xattr_get_error():
 
     ctx.open(furl)
 
+@SkipTest
 def test_xattr_set():
     #raise SkipTest("xattr_set to be implemented")
     print("test_xattr_put")
@@ -169,15 +170,15 @@ def test_xattr_set_error():
         except TypeError as e:
             print("setxattr(%s) raises  %s" % (xa, e))
             pass 
-    
-    
-    
+
+@SkipTest
 def test_Workgroup():
     l_entries = ctx.opendir('smb://').getdents()
     assert(len(l_entries) > 0)
     for entry in l_entries:
         assert(entry.smbc_type == smbc.WORKGROUP), "Entry %s of type %s, expected %s" % (entry.name, smbcType[entry.smbc_type], smbcType[smbc.WORKGROUP])
 
+@SkipTest
 def test_Server():
     uri = 'smb://' + settings.WORKGROUP 
     l_entries = ctx.opendir(uri).getdents()
