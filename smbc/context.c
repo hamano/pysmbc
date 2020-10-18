@@ -143,16 +143,6 @@ Context_init (Context *self, PyObject *args, PyObject *kwds)
       self->auth_fn = auth;
     }
 
-#if SMBCLIENT_VERSION < 500 /* Older than 0.5.0 */
-  if(proto)
-  {
-    debugprintf ("-> Setting client max protocol to %s\n", proto);
-    lp_set_cmdline("client max protocol", proto);
-    debugprintf ("-> Setting client min protocol to %s\n", proto);
-    lp_set_cmdline("client min protocol", proto);
-  }
-#endif
-
   debugprintf ("-> Context_init ()\n");
 
   errno = 0;
@@ -170,13 +160,17 @@ Context_init (Context *self, PyObject *args, PyObject *kwds)
   smbc_setOptionUserData (ctx, self);
   if (auth)
     smbc_setFunctionAuthDataWithContext (ctx, auth_fn);
-#if SMBCLIENT_VERSION >= 500 /* 0.5.0 or newer */
   if(proto)
   {
-    debugprintf ("-> Setting client min/max protocol to %s\n", proto);
-    smbc_setOptionProtocols (ctx, proto, proto);
-  }
+#if SMBCLIENT_VERSION >= 500 /* 0.5.0 or newer */
+    debugprintf("-> Setting client min/max protocol to %s by smbc_setOptionProtocols\n", proto);
+    smbc_setOptionProtocols(ctx, proto, proto);
+#else
+    debugprintf("-> Setting client min/max protocol to %s by smbc_option_set\n", proto);
+    smbc_option_set(ctx, "client max protocol", proto);
+    smbc_option_set(ctx, "client min protocol", proto);
 #endif
+  }
 
   if (smbc_init_context (ctx) == NULL)
     {
