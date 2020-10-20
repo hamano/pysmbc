@@ -585,25 +585,27 @@ Context_getxattr (Context *self, PyObject *args)
     char *uri = NULL;
     char *name = NULL;
     char *buffer = NULL;
+    int ret;
     do /*once*/
       {
         if (!PyArg_ParseTuple(args, "ss", &uri, &name))
             break;
         const smbc_getxattr_fn fn = smbc_getFunctionGetxattr(self->context);
         errno = 0;
-        const int bufsize = fn(self->context, uri, name, NULL, 0);
-        if (bufsize < 0)
+        ret = fn(self->context, uri, name, NULL, 0);
+        if (ret < 0)
           {
             pysmbc_SetFromErrno();
             break;
-          } /*if*/
+          }
+	const int bufsize = ret + 1;
         buffer = (char *)malloc(bufsize);
         if (buffer == NULL)
           {
             PyErr_NoMemory();
             break;
           } /*if*/
-        const int ret = fn(self->context, uri, name, buffer, bufsize);
+        ret = fn(self->context, uri, name, buffer, bufsize);
         if (ret < 0)
           {
             pysmbc_SetFromErrno();
