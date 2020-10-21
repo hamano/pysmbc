@@ -4,10 +4,10 @@
 # directory, so user should have write permission.
 
 WORKGROUP = "WORKGROUP"
-SERVER = "server"
+SERVER = "localhost"
 SHARE = "share"
-USERNAME = "username"
-PASSWORD = "password"
+USERNAME = "user1"
+PASSWORD = "password1"
 TESTDIR = "testdir"
 
 
