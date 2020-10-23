@@ -23,7 +23,8 @@
 
 #ifndef HAVE_SMBCMODULE_H
 #define HAVE_SMBCMODULE_H
-
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>
 #include <stdbool.h>
 #include <libsmbclient.h>
 

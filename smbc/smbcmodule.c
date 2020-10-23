@@ -26,7 +26,6 @@
  */
 
 #include <stdarg.h>
-#include <Python.h>
 #include "smbcmodule.h"
 #include "context.h"
 #include "dir.h"

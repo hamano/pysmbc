@@ -18,7 +18,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <Python.h>
 #include "smbcmodule.h"
 #include "smbcdirent.h"
 
@@ -55,9 +54,9 @@ static int
 Dirent_init (Dirent *self, PyObject *args, PyObject *kwds)
 {
   const char *name;
-  int name_len;
+  Py_ssize_t name_len;
   const char *comment;
-  int comment_len;
+  Py_ssize_t comment_len;
   unsigned int smbc_type;
   static char *kwlist[] =
     {
