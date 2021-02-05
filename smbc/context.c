@@ -163,10 +163,6 @@ Context_init (Context *self, PyObject *args, PyObject *kwds)
 #if SMBCLIENT_VERSION >= 500 /* 0.5.0 or newer */
     debugprintf("-> Setting client min/max protocol to %s by smbc_setOptionProtocols\n", proto);
     smbc_setOptionProtocols(ctx, proto, proto);
-#else
-    debugprintf("-> Setting client min/max protocol to %s by smbc_option_set\n", proto);
-    smbc_option_set(ctx, "client max protocol", proto);
-    smbc_option_set(ctx, "client min protocol", proto);
 #endif
   }
 
