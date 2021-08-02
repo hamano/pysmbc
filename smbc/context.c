@@ -3,6 +3,8 @@
  * Copyright (C) 2002, 2005, 2006, 2007, 2008, 2010, 2011, 2012, 2013  Red Hat, Inc
  * Copyright (C) 2010  Open Source Solution Technology Corporation
  * Copyright (C) 2010  Patrick Geltinger <patlkli@patlkli.org>
+ * Copyright (C) 2021  BaseALT, Ltd. <org@basealt.ru>
+ * Copyright (C) 2021  Igor Chudov <nir@nir.org.ru>
  * Authors:
  *  Tim Waugh <twaugh@redhat.com>
  *  Tsukasa Hamano <hamano@osstech.co.jp>
@@ -113,6 +115,7 @@ Context_init (Context *self, PyObject *args, PyObject *kwds)
 {
   PyObject *auth = NULL;
   int debug = 0;
+  int use_kerberos = 0;
   SMBCCTX *ctx;
   char *proto = NULL;
   static char *kwlist[] =
@@ -120,11 +123,12 @@ Context_init (Context *self, PyObject *args, PyObject *kwds)
       "auth_fn",
       "debug",
       "proto",
+      "use_kerberos",
       NULL
     };
 
-  if (!PyArg_ParseTupleAndKeywords (args, kwds, "|Ois", kwlist,
-				    &auth, &debug, &proto))
+  if (!PyArg_ParseTupleAndKeywords (args, kwds, "|Oisi", kwlist,
+				    &auth, &debug, &proto, &use_kerberos))
     {
       return -1;
     }
@@ -150,6 +154,13 @@ Context_init (Context *self, PyObject *args, PyObject *kwds)
       PyErr_SetFromErrno (PyExc_RuntimeError);
       debugprintf ("<- Context_init() EXCEPTION\n");
       return -1;
+    }
+
+  /* Enable Kerberos authentication */
+  if (use_kerberos)
+    {
+      smbc_setOptionUseKerberos(ctx, 1);
+      smbc_setOptionFallbackAfterKerberos(ctx, 1);
     }
 
   smbc_setDebug (ctx, debug);
