@@ -25,8 +25,6 @@ smbcType = {
     smbc.IPC_SHARE : 'IPC_SHARE'
 }
 
-ACL_KEYWORDS = {"revision" : "", "owner" : "", "group" : "", "acl" : ""}
-ACL_SEPARATOR = "/"
 
 # another map for system errors TODO can you find them in another module?
 EINVAL = 22
