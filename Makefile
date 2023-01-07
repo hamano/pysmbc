@@ -1,4 +1,4 @@
-PYTHON=python
+PYTHON=python3
 NAME=pysmbc
 VERSION:=$(shell $(PYTHON) setup.py --version)
 
@@ -20,7 +20,7 @@ dist:
 	$(PYTHON) setup.py sdist $(SDIST_ARGS)
 
 upload:
-	$(PYTHON) setup.py sdist $(SDIST_ARGS) upload -s
+	twine upload `ls dist/*.tar.gz | tail -1`
 
 install:
 	ROOT= ; \
