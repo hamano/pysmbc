@@ -783,7 +783,7 @@ Context_setNetbiosName (Context *self, PyObject *value, void *closure)
       return -1;
     }
 
-#if PY_MAJOR_VERSION > 3
+#if PY_MAJOR_VERSION >= 3
   chars = PyUnicode_GET_LENGTH(value);
 #else
   chars = PyUnicode_GET_SIZE(value); /* not including NUL */
@@ -857,7 +857,7 @@ Context_setWorkgroup (Context *self, PyObject *value, void *closure)
       return -1;
     }
 
-#if PY_MAJOR_VERSION > 3
+#if PY_MAJOR_VERSION >= 3
   chars = PyUnicode_GET_LENGTH(value);
 #else
   chars = PyUnicode_GET_SIZE(value); /* not including NUL */
