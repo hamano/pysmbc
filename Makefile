@@ -20,7 +20,7 @@ dist:
 	$(PYTHON) setup.py sdist $(SDIST_ARGS)
 
 upload:
-	twine upload `ls dist/*.tar.gz | tail -1`
+	twine upload `/bin/ls -cr dist/*.tar.gz | tail -1`
 
 install:
 	ROOT= ; \

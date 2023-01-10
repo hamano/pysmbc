@@ -87,7 +87,7 @@ def pkgconfig_Dversion(pkg, prefix=None):
 
 setup(
     name="pysmbc",
-    version="1.0.25",
+    version="1.0.25.1",
     description="Python bindings for libsmbclient",
     long_description=__doc__,
     author=[
